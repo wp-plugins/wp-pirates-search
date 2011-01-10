@@ -5,9 +5,10 @@ Tags: plugin, plagiarism, piracy, articles, plagiary
 Requires at least: 2.7
 Tested up to: 3.1
 Stable tag: 1.0
-Version: 1.0
 
-This plugin allows you to find the pirates who coping articles from your website.
+(Eng) This plugin allows you to find the pirates who coping articles from your website.
+
+(Rus) Плагин позволяет находить пиратов, которые копируют статьи с вашего сайта.
 
 == Description ==
 
@@ -19,26 +20,26 @@ Default settings are sufficient for 99% of sites.
 
 1. Upload full directory into your wp-content/plugins directory
 2. Activate the plugin at plugin administration page
-3. Open the plugin configuration page, which is located under Options -> Search for pirates and check settings.
+3. Open the plugin configuration page, which is located under *Options > Search for pirates* and check settings.
 
 == Translations ==
 
-en, ru
+* English
+* Russian
 
 == Screenshots ==
 
-1. Administration interface in WordPress 2.7
+1. Administration interface in WordPress 3.0.4
 
 == Frequently Asked Questions ==
 
-* Where can I read more?
+= Where can I read more? =
 
 Visit http://khrolenok.ru/wp-pirates-search/
 
 == Changelog ==
 
-= Version 1.0, January 7, 2011 =
-
+= 1.0 =
 * Initial release.
 
 == Upgrade Notice ==
