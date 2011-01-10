@@ -1,0 +1,18 @@
+
+.wpPiratesSearch-none	{
+	background: #FF0;
+}
+
+.wpPiratesSearch-legal	{
+	background: #EFE;
+}
+
+.wpPiratesSearch-pirated	{
+	background: #FEE;
+}
+
+.wpPiratesSearch-none,
+.wpPiratesSearch-legal,
+.wpPiratesSearch-pirated	{
+	padding: 0.5em 1em;
+}
