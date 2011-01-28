@@ -1,11 +1,11 @@
 <?php
 /*
 Plugin Name: WP Pirates Search
-Plugin URI: http://khrolenok.ru/wp-pirates-search/
+Plugin URI: http://khrolenok.ru/en/wp-pirates-search/
 Description: This plugin allows you to find the pirates who coping articles from your website.
-Version: 1.0
+Version: 1.0.1
 Author: Andrey Khrolenok
-Author URI: http://khrolenok.ru/
+Author URI: http://khrolenok.ru/en/
 License: GPL3
 */
 
@@ -250,20 +250,22 @@ class wpPiratesSearch {
 		$options_page_hook = add_options_page(__('Search for pirates', self::TEXTDOMAIN), __('Search for pirates', self::TEXTDOMAIN), 'manage_options', 'wpPiratesSearch', array(&$this, 'options_page'));
 
 		//Make the Settings page link to the results page, and vice versa
-		add_screen_meta_link(
-			'wpPiratesSearch_settings_link',
-			__('Go to Settings', self::TEXTDOMAIN),
-			admin_url('options-general.php?page=wpPiratesSearch'),
-			$results_page_hook,
-			array('style' => 'font-weight: bold;')
-		);
-		add_screen_meta_link(
-			'wpPiratesSearch_results_link',
-			__('Go to Search Results', self::TEXTDOMAIN),
-			admin_url('index.php?page=wpPiratesSearch'),
-			$options_page_hook,
-			array('style' => 'font-weight: bold;')
-		);
+		if(function_exists('add_screen_meta_link')){
+			add_screen_meta_link(
+				'wpPiratesSearch_settings_link',
+				__('Go to Settings', self::TEXTDOMAIN),
+				admin_url('options-general.php?page=wpPiratesSearch'),
+				$results_page_hook,
+				array('style' => 'font-weight: bold;')
+			);
+			add_screen_meta_link(
+				'wpPiratesSearch_results_link',
+				__('Go to Search Results', self::TEXTDOMAIN),
+				admin_url('index.php?page=wpPiratesSearch'),
+				$options_page_hook,
+				array('style' => 'font-weight: bold;')
+			);
+		}
 	}
 
 	function options_page(){

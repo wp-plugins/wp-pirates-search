@@ -5,10 +5,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: pirates-search\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-07 16:41+0300\n"
-"PO-Revision-Date: 2011-01-07 16:41+0300\n"
+"Project-Id-Version: WP Pirates Search 1.0\n"
+"Report-Msgid-Bugs-To: http://wordpress.org/tag/wp-pirates-search\n"
+"POT-Creation-Date: 2011-01-10 16:12:20+00:00\n"
+"PO-Revision-Date: 2011-01-10 19:23+0300\n"
 "Last-Translator: Andrey Khrolenok <andrey@khrolenok.ru>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -17,7 +17,7 @@ msgstr ""
 "X-Poedit-Language: Russian\n"
 "X-Poedit-Country: RUSSIAN FEDERATION\n"
 "X-Poedit-SourceCharset: utf-8\n"
-"X-Poedit-KeywordsList: __;_e;_n:1,2\n"
+"X-Poedit-KeywordsList: __;_e;__ngettext:1,2;_n:1,2;__ngettext_noop:1,2;_n_noop:1,2;_c,_nc:4c,1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;_nx_noop:4c,1,2\n"
 "X-Poedit-Basepath: ../\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11) ? 0 : ((n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20)) ? 1 : 2);\n"
 "X-Textdomain-Support: yes\n"
@@ -35,7 +35,6 @@ msgstr "Проверять статей  за одну попытку"
 #: wp-pirates-search.php:198
 #: wp-pirates-search.php:205
 #: wp-pirates-search.php:212
-#, php-format
 msgid "(Recomended value is %d)"
 msgstr "(Рекомендуемое значение: %d)"
 
@@ -68,7 +67,6 @@ msgid "Use automatic start processing"
 msgstr "Автоматически запускать обработку"
 
 #: wp-pirates-search.php:232
-#, php-format
 msgid "Not recomended for sites with high traffic.<br />(If not checked, periodically fetch page <a href=\"%1$s\">%1$s</a> for processing new part of posts.)"
 msgstr "Не рекомендуется для сайтов с большой посещаемостью.<br />(Если не включено, периодически открывайте страницу <a href=\"%1$s\">%1$s</a> для обработки очередной порции записей.)"
 
@@ -81,7 +79,6 @@ msgid "Search for pirates"
 msgstr "Поиск пиратов"
 
 #: wp-pirates-search.php:246
-#, php-format
 msgid "%d pirated copy possible"
 msgid_plural "%d pirated copies possibles"
 msgstr[0] "%d случай пиратства"
@@ -97,7 +94,6 @@ msgid "Go to Search Results"
 msgstr "К результатам поиска"
 
 #: wp-pirates-search.php:273
-#, php-format
 msgid ""
 "<p><strong>Instructions:</strong> Default settings are sufficient for 99%% of sites. Please note that the increase in value increases the load on the server of your website.<br/>\n"
 "Support page with questions and answers: %s (Please write in Russian or English, or use Google Translator for other languages)</p>"
@@ -130,7 +126,6 @@ msgid "Yandex ready"
 msgstr "Яндекс настроен"
 
 #: wp-pirates-search.php:590
-#, php-format
 msgid "Yandex status: %1$d <a href=\"%2$s\" target=\"_blank\">Set/Change your server IP here, need for search by yandex.</a>"
 msgstr "Статус Яндекса: %1$d <a href=\"%2$s\" target=\"_blank\">Установите/Измените IP Вашего сервера тут — это необходимо для поиска через Яндекс.</a>"
 
@@ -158,11 +153,23 @@ msgstr "Плагиат исправлен"
 msgid "No posts matching found."
 msgstr "Ничего не найдено"
 
-#~ msgid "Options are updated."
-#~ msgstr "Настройки обновлены."
+#. Plugin Name of the plugin/theme
+msgid "WP Pirates Search"
+msgstr "WP Pirates Search"
 
-#~ msgid "Update Options &raquo;"
-#~ msgstr "Обновить настройки  &raquo;"
+#. Plugin URI of the plugin/theme
+msgid "http://khrolenok.ru/en/wp-pirates-search/"
+msgstr "http://khrolenok.ru/wp-pirates-search/"
 
-#~ msgid "%d plagiats possibles"
-#~ msgstr "%d случаев плагиата"
+#. Description of the plugin/theme
+msgid "This plugin allows you to find the pirates who coping articles from your website."
+msgstr "Плагин позволяет находить пиратов, которые копируют статьи с вашего сайта."
+
+#. Author of the plugin/theme
+msgid "Andrey Khrolenok"
+msgstr "Андрей Хроленок"
+
+#. Author URI of the plugin/theme
+msgid "http://khrolenok.ru/en/"
+msgstr "http://khrolenok.ru/"
+

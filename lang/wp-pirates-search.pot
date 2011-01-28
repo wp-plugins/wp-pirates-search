@@ -1,0 +1,166 @@
+# Copyright (C) 2010 WP Pirates Search
+# This file is distributed under the same license as the WP Pirates Search package.
+msgid ""
+msgstr ""
+"Project-Id-Version: WP Pirates Search 1.0\n"
+"Report-Msgid-Bugs-To: http://wordpress.org/tag/wp-pirates-search\n"
+"POT-Creation-Date: 2011-01-10 16:12:20+00:00\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2010-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+
+#: wp-pirates-search.php:185
+msgid "Main Settings"
+msgstr ""
+
+#: wp-pirates-search.php:186
+msgid "Check posts at once for one time"
+msgstr ""
+
+#: wp-pirates-search.php:191 wp-pirates-search.php:198
+#: wp-pirates-search.php:205 wp-pirates-search.php:212
+msgid "(Recomended value is %d)"
+msgstr ""
+
+#: wp-pirates-search.php:193
+msgid "Amount of sentences from one post"
+msgstr ""
+
+#: wp-pirates-search.php:200
+msgid "Amount of words one by one in result for compare"
+msgstr ""
+
+#: wp-pirates-search.php:207
+msgid "Check posts again every (hours)"
+msgstr ""
+
+#: wp-pirates-search.php:214
+msgid "Check only pending posts"
+msgstr ""
+
+#: wp-pirates-search.php:218
+msgid "Include searchengine yandex.ru?"
+msgstr ""
+
+#: wp-pirates-search.php:223
+msgid "Filter sites (one site in one line) which should not be displayed"
+msgstr ""
+
+#: wp-pirates-search.php:229
+msgid "Use automatic start processing"
+msgstr ""
+
+#: wp-pirates-search.php:232
+msgid ""
+"Not recomended for sites with high traffic.<br />(If not checked, "
+"periodically fetch page <a href=\"%1$s\">%1$s</a> for processing new part of "
+"posts.)"
+msgstr ""
+
+#: wp-pirates-search.php:244 wp-pirates-search.php:246
+#: wp-pirates-search.php:250 wp-pirates-search.php:272
+#: wp-pirates-search.php:364
+msgid "Search for pirates"
+msgstr ""
+
+#: wp-pirates-search.php:246
+msgid "%d pirated copy possible"
+msgid_plural "%d pirated copies possibles"
+msgstr[0] ""
+msgstr[1] ""
+
+#: wp-pirates-search.php:255
+msgid "Go to Settings"
+msgstr ""
+
+#: wp-pirates-search.php:262
+msgid "Go to Search Results"
+msgstr ""
+
+#: wp-pirates-search.php:273
+msgid ""
+"<p><strong>Instructions:</strong> Default settings are sufficient for 99%% "
+"of sites. Please note that the increase in value increases the load on the "
+"server of your website.<br/>\n"
+"Support page with questions and answers: %s (Please write in Russian or "
+"English, or use Google Translator for other languages)</p>"
+msgstr ""
+
+#: wp-pirates-search.php:278
+msgid "Save Changes"
+msgstr ""
+
+#: wp-pirates-search.php:310
+msgid "Value of posts can not be less than 1."
+msgstr ""
+
+#: wp-pirates-search.php:313
+msgid "Value of sentences can not be less than 1."
+msgstr ""
+
+#: wp-pirates-search.php:316
+msgid "Value of words can not be less than 1."
+msgstr ""
+
+#: wp-pirates-search.php:319
+msgid "Value hours can not be less than 1."
+msgstr ""
+
+#: wp-pirates-search.php:588
+msgid "Yandex ready"
+msgstr ""
+
+#: wp-pirates-search.php:590
+msgid ""
+"Yandex status: %1$d <a href=\"%2$s\" target=\"_blank\">Set/Change your "
+"server IP here, need for search by yandex.</a>"
+msgstr ""
+
+#: wp-pirates-search.php:672
+msgid "Don't search for plagiarism for this post"
+msgstr ""
+
+#: wp-pirates-search.php:682
+msgid "CACHE"
+msgstr ""
+
+#: wp-pirates-search.php:691
+msgid "This is not plagiarism"
+msgstr ""
+
+#: wp-pirates-search.php:694
+msgid "It is a plagiarism"
+msgstr ""
+
+#: wp-pirates-search.php:697
+msgid "Plagiarism corrected"
+msgstr ""
+
+#: wp-pirates-search.php:712
+msgid "No posts matching found."
+msgstr ""
+
+#. Plugin Name of the plugin/theme
+msgid "WP Pirates Search"
+msgstr ""
+
+#. Plugin URI of the plugin/theme
+msgid "http://khrolenok.ru/en/wp-pirates-search/"
+msgstr ""
+
+#. Description of the plugin/theme
+msgid ""
+"This plugin allows you to find the pirates who coping articles from your "
+"website."
+msgstr ""
+
+#. Author of the plugin/theme
+msgid "Andrey Khrolenok"
+msgstr ""
+
+#. Author URI of the plugin/theme
+msgid "http://khrolenok.ru/en/"
+msgstr ""
