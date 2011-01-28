@@ -57,6 +57,7 @@ Visit http://khrolenok.ru/en/wp-pirates-search/
 * Fixed some minor bugs
 
 = 1.0 =
+
 * Initial release.
 
 == Upgrade Notice ==
