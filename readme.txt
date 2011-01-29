@@ -15,7 +15,7 @@ Plug-in automatically interrogates the search engines to find copies of articles
 Default settings are sufficient for 99% of sites.
 
 = Features =
-* Automatically import your settings and search results from earlier versions of the plug;
+* Automatically import your settings and search results from earlier versions of the plugin;
 * Internet search of copies of your site pages;
 * Ability to start processing by CRON or automatically, without its use;
 * Searching for copies through the search engines Google and Yandex (Russian search engine);
