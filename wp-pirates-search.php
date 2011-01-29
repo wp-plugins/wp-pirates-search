@@ -198,7 +198,7 @@ class wpPiratesSearch {
 
 		register_setting('wpPiratesSearch_options', 'wpPiratesSearch_options', array(&$this, 'options_validate'));
 
-		add_settings_section('wpPiratesSearch', __('Main Settings', self::TEXTDOMAIN), function(){}, 'wpPiratesSearch');
+		add_settings_section('wpPiratesSearch', __('Main Settings', self::TEXTDOMAIN), create_function('', ''), 'wpPiratesSearch');
 		add_settings_field('post_at_once', __('Check posts at once for one time', self::TEXTDOMAIN), array(&$this, 'option_display'), 'wpPiratesSearch', 'wpPiratesSearch', array(
 			'type'		=> 'number',
 			'id'		=> 'post_at_once',
