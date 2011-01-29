@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WP Pirates Search 1.0\n"
 "Report-Msgid-Bugs-To: http://wordpress.org/tag/wp-pirates-search\n"
-"POT-Creation-Date: 2011-01-10 16:12:20+00:00\n"
-"PO-Revision-Date: 2011-01-10 19:23+0300\n"
+"POT-Creation-Date: 2011-01-29 12:05+0300\n"
+"PO-Revision-Date: 2011-01-29 12:13+0300\n"
 "Last-Translator: Andrey Khrolenok <andrey@khrolenok.ru>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -23,77 +23,101 @@ msgstr ""
 "X-Textdomain-Support: yes\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: wp-pirates-search.php:185
+#: wp-pirates-search.php:65
+msgid "WP Pirates Search"
+msgstr "WP Pirates Search"
+
+#: wp-pirates-search.php:67
+msgid "http://khrolenok.ru/en/wp-pirates-search/"
+msgstr "http://khrolenok.ru/wp-pirates-search/"
+
+#: wp-pirates-search.php:69
+msgid "This plugin allows you to find the pirates who coping articles from your website."
+msgstr "Плагин позволяет находить пиратов, которые копируют статьи с вашего сайта."
+
+#: wp-pirates-search.php:71
+msgid "Andrey Khrolenok"
+msgstr "Андрей Хроленок"
+
+#: wp-pirates-search.php:73
+msgid "http://khrolenok.ru/en/"
+msgstr "http://khrolenok.ru/"
+
+#: wp-pirates-search.php:201
 msgid "Main Settings"
 msgstr "Основные настройки"
 
-#: wp-pirates-search.php:186
+#: wp-pirates-search.php:202
 msgid "Check posts at once for one time"
 msgstr "Проверять статей  за одну попытку"
 
-#: wp-pirates-search.php:191
-#: wp-pirates-search.php:198
-#: wp-pirates-search.php:205
-#: wp-pirates-search.php:212
+#: wp-pirates-search.php:207
+#: wp-pirates-search.php:214
+#: wp-pirates-search.php:221
+#: wp-pirates-search.php:228
+#, php-format
 msgid "(Recomended value is %d)"
 msgstr "(Рекомендуемое значение: %d)"
 
-#: wp-pirates-search.php:193
+#: wp-pirates-search.php:209
 msgid "Amount of sentences from one post"
 msgstr "Число предложений для поиска из одной статьи"
 
-#: wp-pirates-search.php:200
+#: wp-pirates-search.php:216
 msgid "Amount of words one by one in result for compare"
 msgstr "Число совпадающих слов в результате"
 
-#: wp-pirates-search.php:207
+#: wp-pirates-search.php:223
 msgid "Check posts again every (hours)"
 msgstr "Проверять статьи повторно каждые (часов)"
 
-#: wp-pirates-search.php:214
+#: wp-pirates-search.php:230
 msgid "Check only pending posts"
 msgstr "Проверять только ожидающие публикацию статьи"
 
-#: wp-pirates-search.php:218
+#: wp-pirates-search.php:234
 msgid "Include searchengine yandex.ru?"
 msgstr "Искать также через Яндекс?"
 
-#: wp-pirates-search.php:223
+#: wp-pirates-search.php:239
 msgid "Filter sites (one site in one line) which should not be displayed"
 msgstr "Список сайтов (по одному на строку) которые не должны отображаться"
 
-#: wp-pirates-search.php:229
+#: wp-pirates-search.php:245
 msgid "Use automatic start processing"
 msgstr "Автоматически запускать обработку"
 
-#: wp-pirates-search.php:232
+#: wp-pirates-search.php:248
+#, php-format
 msgid "Not recomended for sites with high traffic.<br />(If not checked, periodically fetch page <a href=\"%1$s\">%1$s</a> for processing new part of posts.)"
 msgstr "Не рекомендуется для сайтов с большой посещаемостью.<br />(Если не включено, периодически открывайте страницу <a href=\"%1$s\">%1$s</a> для обработки очередной порции записей.)"
 
-#: wp-pirates-search.php:244
-#: wp-pirates-search.php:246
-#: wp-pirates-search.php:250
-#: wp-pirates-search.php:272
-#: wp-pirates-search.php:364
+#: wp-pirates-search.php:260
+#: wp-pirates-search.php:262
+#: wp-pirates-search.php:266
+#: wp-pirates-search.php:290
+#: wp-pirates-search.php:387
 msgid "Search for pirates"
 msgstr "Поиск пиратов"
 
-#: wp-pirates-search.php:246
+#: wp-pirates-search.php:262
+#, php-format
 msgid "%d pirated copy possible"
 msgid_plural "%d pirated copies possibles"
 msgstr[0] "%d случай пиратства"
 msgstr[1] "%d случая пиратства"
 msgstr[2] "%d случаев пиратства"
 
-#: wp-pirates-search.php:255
+#: wp-pirates-search.php:272
 msgid "Go to Settings"
 msgstr "К настройкам"
 
-#: wp-pirates-search.php:262
+#: wp-pirates-search.php:279
 msgid "Go to Search Results"
 msgstr "К результатам поиска"
 
-#: wp-pirates-search.php:273
+#: wp-pirates-search.php:291
+#, php-format
 msgid ""
 "<p><strong>Instructions:</strong> Default settings are sufficient for 99%% of sites. Please note that the increase in value increases the load on the server of your website.<br/>\n"
 "Support page with questions and answers: %s (Please write in Russian or English, or use Google Translator for other languages)</p>"
@@ -101,75 +125,80 @@ msgstr ""
 "<p><strong>Инструкции:</strong> Настройки по-умолчанию достаточны для 99%% сайтов. Учитывайте, что увеличение значений повышает нагрузку на сервер Вашего сайта.<br/>\n"
 "Страница поддержки с вопросами и ответами: %s</p>"
 
-#: wp-pirates-search.php:278
+#: wp-pirates-search.php:296
 msgid "Save Changes"
 msgstr "Сохранить изменения"
 
-#: wp-pirates-search.php:310
+#: wp-pirates-search.php:328
 msgid "Value of posts can not be less than 1."
 msgstr "Число статей  не должно быть меньше 1."
 
-#: wp-pirates-search.php:313
+#: wp-pirates-search.php:331
 msgid "Value of sentences can not be less than 1."
 msgstr "Число предложений не должно быть меньше 1."
 
-#: wp-pirates-search.php:316
+#: wp-pirates-search.php:334
 msgid "Value of words can not be less than 1."
 msgstr "Число слов не должно быть меньше 1."
 
-#: wp-pirates-search.php:319
+#: wp-pirates-search.php:337
 msgid "Value hours can not be less than 1."
 msgstr "Число часов не должно быть меньше 1."
 
-#: wp-pirates-search.php:588
+#: wp-pirates-search.php:389
+msgid "Statistic"
+msgstr "Статистика"
+
+#: wp-pirates-search.php:390
+#, php-format
+msgid "Over the last week processed %d article"
+msgid_plural "Over the last week processed %d articles"
+msgstr[0] "За последнюю неделю обработано %d статья"
+msgstr[1] "За последнюю неделю обработано %d статьи"
+msgstr[2] "За последнюю неделю обработано %d статей"
+
+#: wp-pirates-search.php:390
+#, php-format
+msgid ", including the last 24 hours processed %d article."
+msgid_plural ", including the last 24 hours processed %d articles."
+msgstr[0] ", из них за последние 24 часа — %d статья."
+msgstr[1] ", из них за последние 24 часа — %d статьи."
+msgstr[2] ", из них за последние 24 часа — %d статей."
+
+#: wp-pirates-search.php:392
+msgid "Search results"
+msgstr "Результаты поиска"
+
+#: wp-pirates-search.php:616
 msgid "Yandex ready"
 msgstr "Яндекс настроен"
 
-#: wp-pirates-search.php:590
+#: wp-pirates-search.php:618
+#, php-format
 msgid "Yandex status: %1$d <a href=\"%2$s\" target=\"_blank\">Set/Change your server IP here, need for search by yandex.</a>"
 msgstr "Статус Яндекса: %1$d <a href=\"%2$s\" target=\"_blank\">Установите/Измените IP Вашего сервера тут — это необходимо для поиска через Яндекс.</a>"
 
-#: wp-pirates-search.php:672
+#: wp-pirates-search.php:700
 msgid "Don't search for plagiarism for this post"
 msgstr "Не искать плагиат для этой статьи"
 
-#: wp-pirates-search.php:682
+#: wp-pirates-search.php:710
 msgid "CACHE"
 msgstr "ИЗ КЭША"
 
-#: wp-pirates-search.php:691
+#: wp-pirates-search.php:719
 msgid "This is not plagiarism"
 msgstr "Это не плагиат"
 
-#: wp-pirates-search.php:694
+#: wp-pirates-search.php:722
 msgid "It is a plagiarism"
 msgstr "Это плагиат"
 
-#: wp-pirates-search.php:697
+#: wp-pirates-search.php:725
 msgid "Plagiarism corrected"
 msgstr "Плагиат исправлен"
 
-#: wp-pirates-search.php:712
+#: wp-pirates-search.php:739
 msgid "No posts matching found."
-msgstr "Ничего не найдено"
-
-#. Plugin Name of the plugin/theme
-msgid "WP Pirates Search"
-msgstr "WP Pirates Search"
-
-#. Plugin URI of the plugin/theme
-msgid "http://khrolenok.ru/en/wp-pirates-search/"
-msgstr "http://khrolenok.ru/wp-pirates-search/"
-
-#. Description of the plugin/theme
-msgid "This plugin allows you to find the pirates who coping articles from your website."
-msgstr "Плагин позволяет находить пиратов, которые копируют статьи с вашего сайта."
-
-#. Author of the plugin/theme
-msgid "Andrey Khrolenok"
-msgstr "Андрей Хроленок"
-
-#. Author URI of the plugin/theme
-msgid "http://khrolenok.ru/en/"
-msgstr "http://khrolenok.ru/"
+msgstr "Ничего не найдено."
 
