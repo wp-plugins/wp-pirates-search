@@ -3,16 +3,13 @@
 Plugin Name: WP Pirates Search
 Plugin URI: http://khrolenok.ru/en/wp-pirates-search/
 Description: This plugin allows you to find the pirates who coping articles from your website.
-Version: 1.0.2
+Version: 1.0.1
 Author: Andrey Khrolenok
 Author URI: http://khrolenok.ru/en/
 License: GPL3
 */
 
-if(file_exists(dirname(__FILE__) . '/flag-DEBUG')){
-	define('wpPiratesSearch_DEBUG', 1);
-	error_reporting(E_ALL ^ E_NOTICE);
-}
+// define('wpPiratesSearch_DEBUG', 1);
 
 
 
@@ -59,19 +56,6 @@ class wpPiratesSearch {
 		// *** Install and Uninstall *********************************
 		register_activation_hook(__FILE__, array(&$this, 'install'));
 		// register_deactivation_hook(__FILE__, array(&$this, 'uninstall'));
-		
-		if(false){
-			// Plugin Name of the plugin/theme
-			__('WP Pirates Search', self::TEXTDOMAIN);
-			// Plugin URI of the plugin/theme
-			__('http://khrolenok.ru/en/wp-pirates-search/', self::TEXTDOMAIN);
-			// Description of the plugin/theme
-			__('This plugin allows you to find the pirates who coping articles from your website.', self::TEXTDOMAIN);
-			// Author of the plugin/theme
-			__('Andrey Khrolenok', self::TEXTDOMAIN);
-			// Author URI of the plugin/theme
-			__('http://khrolenok.ru/en/', self::TEXTDOMAIN);
-		}
     }
 
 	function load_language(){
@@ -198,7 +182,7 @@ class wpPiratesSearch {
 
 		register_setting('wpPiratesSearch_options', 'wpPiratesSearch_options', array(&$this, 'options_validate'));
 
-		add_settings_section('wpPiratesSearch', __('Main Settings', self::TEXTDOMAIN), create_function('', ''), 'wpPiratesSearch');
+		add_settings_section('wpPiratesSearch', __('Main Settings', self::TEXTDOMAIN), null, 'wpPiratesSearch');
 		add_settings_field('post_at_once', __('Check posts at once for one time', self::TEXTDOMAIN), array(&$this, 'option_display'), 'wpPiratesSearch', 'wpPiratesSearch', array(
 			'type'		=> 'number',
 			'id'		=> 'post_at_once',
@@ -377,19 +361,9 @@ Support page with questions and answers: %s (Please write in Russian or English,
 			}
 		}
 
-		$select = $wpdb->prepare("SELECT COUNT(*) FROM {$this->db_table} WHERE time > %d", time() - 7 * 24 * 60 * 60);
-		$week_processed = $wpdb->get_var($select);
-		//
-		$select = $wpdb->prepare("SELECT COUNT(*) FROM {$this->db_table} WHERE time > %d", time() - 24 * 60 * 60);
-		$day_processed = $wpdb->get_var($select);
 ?>
 	<div class="wrap">
 		<h2><?php _e('Search for pirates', self::TEXTDOMAIN); ?></h2>
-		
-		<h3><?php _e('Statistic', self::TEXTDOMAIN); ?></h3>
-		<p><?php printf(_n('Over the last week processed %d article', 'Over the last week processed %d articles', $week_processed, self::TEXTDOMAIN), $week_processed); ?><?php printf(_n(', including the last 24 hours processed %d article.', ', including the last 24 hours processed %d articles.', $day_processed, self::TEXTDOMAIN), $day_processed); ?></p>
-		
-		<h3><?php _e('Search results', self::TEXTDOMAIN); ?></h3>
 		<?php $this->print_result(); ?>
 	</div>
 <?php
@@ -736,7 +710,9 @@ if(defined('wpPiratesSearch_DEBUG'))	echo htmlspecialchars($insert) . '<br />';
 			}
 		}
 		else {
-			print "<p>" . __('No posts matching found.', self::TEXTDOMAIN) . "</p>";
+			echo "<br /><h3>";
+			_e('No posts matching found.', self::TEXTDOMAIN);
+			echo "</h3><br />";
 		}
 	}
 
