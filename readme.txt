@@ -4,7 +4,7 @@ Donate link: http://khrolenok.ru/en/wp-pirates-search/
 Tags: plugin, plagiarism, piracy, articles, plagiary, google, yandex, admin, posts, pages, administration, automatic, content, notification
 Requires at least: 2.7
 Tested up to: 3.0.4
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 
 This plugin allows you to find the pirates who coping articles from your website.
 
@@ -15,7 +15,6 @@ Plug-in automatically interrogates the search engines to find copies of articles
 Default settings are sufficient for 99% of sites.
 
 = Features =
-
 * Automatically import your settings and search results from earlier versions of the plug;
 * Internet search of copies of your site pages;
 * Ability to start processing by CRON or automatically, without its use;
@@ -25,15 +24,14 @@ Default settings are sufficient for 99% of sites.
 * Ability to mark a copy of the plagiarism for further monitoring.
 
 = Localizations =
-
 * English (en_EN)
 * Russian (ru_RU)
 
-Is your native language missing? Translating the plugin is easy if you understand english and are fluent in another language. Just send me an email.
+Is your native language missing? Translating the plugin is easy if you understand english and are fluent in another language. Just use file `lang/wp-pirates-search.pot` as template to make new translation. And, please, send it to me by e-mail...
 
 == Installation ==
 
-*Pay attention!* Before activating of this plugin please deactivate his earlier versions — plugins “Posts Compare” and “Plagiat Search”. If you do not do this, attempt to activate plugin will cause a fatal error — it deliberately to make protection against possible disruptions caused by the simultaneous operation of two plugins.
+*Pay attention!* Before activating of this plugin please deactivate his earlier versions -- plugins "Posts Compare" and "Plagiat Search". If you do not do this, attempt to activate plugin will cause a fatal error -- it deliberately to make protection against possible disruptions caused by the simultaneous operation of two plugins.
 
 1. Upload full directory into your `wp-content/plugins` directory
 1. Activate the plugin at plugin administration page
@@ -52,12 +50,14 @@ Visit http://khrolenok.ru/en/wp-pirates-search/
 
 == Changelog ==
 
-= 1.0.1 =
+= 1.0.2 =
+* Fixed some minor bugs.
+* Added statistical report of pages processing.
 
-* Fixed some minor bugs
+= 1.0.1 =
+* Fixed some minor bugs.
 
 = 1.0 =
-
 * Initial release.
 
 == Upgrade Notice ==

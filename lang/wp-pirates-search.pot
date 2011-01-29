@@ -11,156 +11,185 @@ msgstr ""
 "PO-Revision-Date: 2010-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"X-Poedit-KeywordsList: __;_e;__ngettext:1,2;_n:1,2;__ngettext_noop:1,2;_n_noop:1,2;_c,_nc:4c,1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;_nx_noop:4c,1,2\n"
+"X-Poedit-Basepath: ../\n"
+"X-Textdomain-Support: yes\n"
+"X-Poedit-SearchPath-0: .\n"
 
-#: wp-pirates-search.php:185
+#: wp-pirates-search.php:65
+msgid "WP Pirates Search"
+msgstr ""
+
+#: wp-pirates-search.php:67
+msgid "http://khrolenok.ru/en/wp-pirates-search/"
+msgstr ""
+
+#: wp-pirates-search.php:69
+msgid "This plugin allows you to find the pirates who coping articles from your website."
+msgstr ""
+
+#: wp-pirates-search.php:71
+msgid "Andrey Khrolenok"
+msgstr ""
+
+#: wp-pirates-search.php:73
+msgid "http://khrolenok.ru/en/"
+msgstr ""
+
+#: wp-pirates-search.php:201
 msgid "Main Settings"
 msgstr ""
 
-#: wp-pirates-search.php:186
+#: wp-pirates-search.php:202
 msgid "Check posts at once for one time"
 msgstr ""
 
-#: wp-pirates-search.php:191 wp-pirates-search.php:198
-#: wp-pirates-search.php:205 wp-pirates-search.php:212
+#: wp-pirates-search.php:207
+#: wp-pirates-search.php:214
+#: wp-pirates-search.php:221
+#: wp-pirates-search.php:228
+#, php-format
 msgid "(Recomended value is %d)"
 msgstr ""
 
-#: wp-pirates-search.php:193
+#: wp-pirates-search.php:209
 msgid "Amount of sentences from one post"
 msgstr ""
 
-#: wp-pirates-search.php:200
+#: wp-pirates-search.php:216
 msgid "Amount of words one by one in result for compare"
 msgstr ""
 
-#: wp-pirates-search.php:207
+#: wp-pirates-search.php:223
 msgid "Check posts again every (hours)"
 msgstr ""
 
-#: wp-pirates-search.php:214
+#: wp-pirates-search.php:230
 msgid "Check only pending posts"
 msgstr ""
 
-#: wp-pirates-search.php:218
+#: wp-pirates-search.php:234
 msgid "Include searchengine yandex.ru?"
 msgstr ""
 
-#: wp-pirates-search.php:223
+#: wp-pirates-search.php:239
 msgid "Filter sites (one site in one line) which should not be displayed"
 msgstr ""
 
-#: wp-pirates-search.php:229
+#: wp-pirates-search.php:245
 msgid "Use automatic start processing"
 msgstr ""
 
-#: wp-pirates-search.php:232
-msgid ""
-"Not recomended for sites with high traffic.<br />(If not checked, "
-"periodically fetch page <a href=\"%1$s\">%1$s</a> for processing new part of "
-"posts.)"
+#: wp-pirates-search.php:248
+#, php-format
+msgid "Not recomended for sites with high traffic.<br />(If not checked, periodically fetch page <a href=\"%1$s\">%1$s</a> for processing new part of posts.)"
 msgstr ""
 
-#: wp-pirates-search.php:244 wp-pirates-search.php:246
-#: wp-pirates-search.php:250 wp-pirates-search.php:272
-#: wp-pirates-search.php:364
+#: wp-pirates-search.php:260
+#: wp-pirates-search.php:262
+#: wp-pirates-search.php:266
+#: wp-pirates-search.php:290
+#: wp-pirates-search.php:387
 msgid "Search for pirates"
 msgstr ""
 
-#: wp-pirates-search.php:246
+#: wp-pirates-search.php:262
+#, php-format
 msgid "%d pirated copy possible"
 msgid_plural "%d pirated copies possibles"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
-#: wp-pirates-search.php:255
+#: wp-pirates-search.php:272
 msgid "Go to Settings"
 msgstr ""
 
-#: wp-pirates-search.php:262
+#: wp-pirates-search.php:279
 msgid "Go to Search Results"
 msgstr ""
 
-#: wp-pirates-search.php:273
+#: wp-pirates-search.php:291
+#, php-format
 msgid ""
-"<p><strong>Instructions:</strong> Default settings are sufficient for 99%% "
-"of sites. Please note that the increase in value increases the load on the "
-"server of your website.<br/>\n"
-"Support page with questions and answers: %s (Please write in Russian or "
-"English, or use Google Translator for other languages)</p>"
+"<p><strong>Instructions:</strong> Default settings are sufficient for 99%% of sites. Please note that the increase in value increases the load on the server of your website.<br/>\n"
+"Support page with questions and answers: %s (Please write in Russian or English, or use Google Translator for other languages)</p>"
 msgstr ""
 
-#: wp-pirates-search.php:278
+#: wp-pirates-search.php:296
 msgid "Save Changes"
 msgstr ""
 
-#: wp-pirates-search.php:310
+#: wp-pirates-search.php:328
 msgid "Value of posts can not be less than 1."
 msgstr ""
 
-#: wp-pirates-search.php:313
+#: wp-pirates-search.php:331
 msgid "Value of sentences can not be less than 1."
 msgstr ""
 
-#: wp-pirates-search.php:316
+#: wp-pirates-search.php:334
 msgid "Value of words can not be less than 1."
 msgstr ""
 
-#: wp-pirates-search.php:319
+#: wp-pirates-search.php:337
 msgid "Value hours can not be less than 1."
 msgstr ""
 
-#: wp-pirates-search.php:588
+#: wp-pirates-search.php:389
+msgid "Statistic"
+msgstr ""
+
+#: wp-pirates-search.php:390
+#, php-format
+msgid "Over the last week processed %d article"
+msgid_plural "Over the last week processed %d articles"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: wp-pirates-search.php:390
+#, php-format
+msgid ", including the last 24 hours processed %d article."
+msgid_plural ", including the last 24 hours processed %d articles."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: wp-pirates-search.php:392
+msgid "Search results"
+msgstr ""
+
+#: wp-pirates-search.php:616
 msgid "Yandex ready"
 msgstr ""
 
-#: wp-pirates-search.php:590
-msgid ""
-"Yandex status: %1$d <a href=\"%2$s\" target=\"_blank\">Set/Change your "
-"server IP here, need for search by yandex.</a>"
+#: wp-pirates-search.php:618
+#, php-format
+msgid "Yandex status: %1$d <a href=\"%2$s\" target=\"_blank\">Set/Change your server IP here, need for search by yandex.</a>"
 msgstr ""
 
-#: wp-pirates-search.php:672
+#: wp-pirates-search.php:700
 msgid "Don't search for plagiarism for this post"
 msgstr ""
 
-#: wp-pirates-search.php:682
+#: wp-pirates-search.php:710
 msgid "CACHE"
 msgstr ""
 
-#: wp-pirates-search.php:691
+#: wp-pirates-search.php:719
 msgid "This is not plagiarism"
 msgstr ""
 
-#: wp-pirates-search.php:694
+#: wp-pirates-search.php:722
 msgid "It is a plagiarism"
 msgstr ""
 
-#: wp-pirates-search.php:697
+#: wp-pirates-search.php:725
 msgid "Plagiarism corrected"
 msgstr ""
 
-#: wp-pirates-search.php:712
+#: wp-pirates-search.php:739
 msgid "No posts matching found."
-msgstr ""
-
-#. Plugin Name of the plugin/theme
-msgid "WP Pirates Search"
-msgstr ""
-
-#. Plugin URI of the plugin/theme
-msgid "http://khrolenok.ru/en/wp-pirates-search/"
-msgstr ""
-
-#. Description of the plugin/theme
-msgid ""
-"This plugin allows you to find the pirates who coping articles from your "
-"website."
-msgstr ""
-
-#. Author of the plugin/theme
-msgid "Andrey Khrolenok"
-msgstr ""
-
-#. Author URI of the plugin/theme
-msgid "http://khrolenok.ru/en/"
 msgstr ""
