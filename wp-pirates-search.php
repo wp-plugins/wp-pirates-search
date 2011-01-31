@@ -48,8 +48,8 @@ class wpPiratesSearch {
 		$this->db_table = $wpdb->prefix . 'pirates_search';
 
 		// *** Actions ***********************************************
-		add_action('init',			array(&$this, 'load_language'));
-		add_action('shutdown',		array(&$this, 'shutdown_process'));
+		add_action('init',			array(&$this, 'init_textdomain'));
+		add_action('shutdown',		array(&$this, 'cron_hook'));
 		add_action('admin_init',	array(&$this, 'admin_init'));	// Admin Panel Init
 		add_action('admin_menu',	array(&$this, 'admin_menu'));	// Admin Panel Page
 
@@ -74,7 +74,12 @@ class wpPiratesSearch {
 		}
     }
 
-	function load_language(){
+	/** =====================================================================================================
+	* Translate the plugin...
+	* 
+	* @return void
+	*/
+	function init_textdomain(){
 		if(function_exists('load_plugin_textdomain')){
 			if(!defined('WP_PLUGIN_DIR')){
 				load_plugin_textdomain(self::TEXTDOMAIN, str_replace(ABSPATH, '', dirname(__FILE__)) . '/lang');
@@ -84,6 +89,11 @@ class wpPiratesSearch {
 		}
 	}
 
+	/** =====================================================================================================
+	* In order to install the plugin, few things are to be done ...
+	* 
+	* @return void
+	*/
 	function install(){
 		global $wpdb;
 		static $statuses = array('none', 'pirated', 'legal', 'ignore');
@@ -173,8 +183,24 @@ class wpPiratesSearch {
 		}
 
 		update_option('wpPiratesSearch_db_version', self::DB_VERSION);
+
+		// wp_schedule_event(time(), 'hourly', array(&$this, 'cron_hook'));
 	}
 
+	/** =====================================================================================================
+	* In order to uninstall the plugin, few things are to be done ...
+	* 
+	* @return void
+	*/
+	function plagiatSearch_uninstall () {
+		// wp_clear_scheduled_hook(array(&$this, 'cron_hook'));
+	}
+
+	/** =====================================================================================================
+	* Load options of the plugin
+	* 
+	* @return array list of options
+	*/
 	function get_options(){
 		$opt = get_option('wpPiratesSearch_options');
 
@@ -190,14 +216,82 @@ class wpPiratesSearch {
 		return $opt;
 	}
 
+	/** =====================================================================================================
+	* Initialize the plugin 
+	* 
+	* @return void
+	*/
 	function admin_init(){
-		wp_register_style('wpPiratedSearch_css',
+		wp_register_style('wpPiratesSearch-css',
 			WP_PLUGIN_URL . '/' . substr(plugin_basename(__FILE__), 0, -3) . 'css'
 		);
-		wp_enqueue_style('wpPiratedSearch_css');
 
 		register_setting('wpPiratesSearch_options', 'wpPiratesSearch_options', array(&$this, 'options_validate'));
+	}
 
+	/** =====================================================================================================
+	* Create the submenus in "Dashboard" and "Options" menus with the number of possible plagiaries found
+	* 
+	* @return void
+	*/
+	function admin_menu(){
+		if(current_user_can('delete_pages') || current_user_can('delete_posts') || current_user_can('edit_pages') || current_user_can('edit_posts')){
+			global $wpdb;
+
+			$select = "SELECT COUNT(*) FROM {$this->db_table} WHERE status = 'none' AND searchtext IS NOT NULL";
+			$nbPlagiat = $wpdb->get_var($select);
+
+			if($nbPlagiat == 0){
+				$results_page_hook = add_submenu_page('index.php', __('Search for pirates', self::TEXTDOMAIN), __('Search for pirates', self::TEXTDOMAIN), 6, 'wpPiratesSearch', array(&$this, 'results_page'));
+			} else {
+				$results_page_hook = add_submenu_page('index.php', __('Search for pirates', self::TEXTDOMAIN), __('Search for pirates', self::TEXTDOMAIN) . ' <span class=\'update-plugins count-1\' title=\'' . sprintf( _n('%d pirated copy possible', '%d pirated copies possibles', $nbPlagiat, self::TEXTDOMAIN), $nbPlagiat) . '\'><span class=\'update-count\'>'.$nbPlagiat.'</span></span>', 6, 'wpPiratesSearch', array(&$this, 'results_page'));
+			}
+		}
+
+		$options_page_hook = add_options_page(__('Search for pirates', self::TEXTDOMAIN), __('Search for pirates', self::TEXTDOMAIN), 'manage_options', 'wpPiratesSearch', array(&$this, 'options_page'));
+
+		// Using registered $page handle to hook stylesheet loading
+		add_action('admin_print_styles-' . $results_page_hook, array(&$this, 'admin_styles'));
+
+		// Make the Settings page link to the results page, and vice versa
+		if(function_exists('add_screen_meta_link')){
+			add_screen_meta_link(
+				'wpPiratesSearch_settings_link',
+				__('Go to Settings', self::TEXTDOMAIN),
+				admin_url('options-general.php?page=wpPiratesSearch'),
+				$results_page_hook,
+				array('style' => 'font-weight: bold;')
+			);
+			add_screen_meta_link(
+				'wpPiratesSearch_results_link',
+				__('Go to Search Results', self::TEXTDOMAIN),
+				admin_url('index.php?page=wpPiratesSearch'),
+				$options_page_hook,
+				array('style' => 'font-weight: bold;')
+			);
+		}
+	}
+
+	/** =====================================================================================================
+	* Inject CSS and JS script into the head of the page (only admin one)
+	* 
+	* @return void
+	*/
+	function admin_styles(){
+		wp_enqueue_style('wpPiratesSearch-css');
+		wp_enqueue_script('jquery');   
+		wp_enqueue_script('jquery-ui-core');   
+		wp_enqueue_script('jquery-ui-dialog');
+		wp_enqueue_script('jquery-ui-tabs');
+		echo '<script type="text/javascript"> addLoadEvent = function(func){if(typeof jQuery!="undefined")jQuery(document).ready(func);else if(typeof wpOnload!="function"){wpOnload=func;}else{var oldonload=wpOnload;wpOnload=function(){oldonload();func();}}};</script>' ; 
+	}
+
+	/** =====================================================================================================
+	* 
+	* 
+	* @return void
+	*/
+	function options_page(){
 		add_settings_section('wpPiratesSearch', __('Main Settings', self::TEXTDOMAIN), create_function('', ''), 'wpPiratesSearch');
 		add_settings_field('post_at_once', __('Check posts at once for one time', self::TEXTDOMAIN), array(&$this, 'option_display'), 'wpPiratesSearch', 'wpPiratesSearch', array(
 			'type'		=> 'number',
@@ -247,45 +341,8 @@ class wpPiratesSearch {
 			'id'		=> 'auto_processing',
 			'description'	=> sprintf(__('Not recomended for sites with high traffic.<br />(If not checked, periodically fetch page <a href="%1$s">%1$s</a> for processing new part of posts.)', self::TEXTDOMAIN), WP_PLUGIN_URL . '/' . dirname(plugin_basename(__FILE__)) . '/process.php'),
 		));
-	}
 
-	function admin_menu(){
-		if(current_user_can('delete_pages') || current_user_can('delete_posts') || current_user_can('edit_pages') || current_user_can('edit_posts')){
-			global $wpdb;
-
-			$select = "SELECT COUNT(*) FROM {$this->db_table} WHERE status = 'none' AND searchtext IS NOT NULL";
-			$nbPlagiat = $wpdb->get_var($select);
-
-			if($nbPlagiat == 0){
-				$results_page_hook = add_submenu_page('index.php', __('Search for pirates', self::TEXTDOMAIN), __('Search for pirates', self::TEXTDOMAIN), 6, 'wpPiratesSearch', array(&$this, 'results_page'));
-			} else {
-				$results_page_hook = add_submenu_page('index.php', __('Search for pirates', self::TEXTDOMAIN), __('Search for pirates', self::TEXTDOMAIN) . ' <span class=\'update-plugins count-1\' title=\'' . sprintf( _n('%d pirated copy possible', '%d pirated copies possibles', $nbPlagiat, self::TEXTDOMAIN), $nbPlagiat) . '\'><span class=\'update-count\'>'.$nbPlagiat.'</span></span>', 6, 'wpPiratesSearch', array(&$this, 'results_page'));
-			}
-		}
-
-		$options_page_hook = add_options_page(__('Search for pirates', self::TEXTDOMAIN), __('Search for pirates', self::TEXTDOMAIN), 'manage_options', 'wpPiratesSearch', array(&$this, 'options_page'));
-
-		//Make the Settings page link to the results page, and vice versa
-		if(function_exists('add_screen_meta_link')){
-			add_screen_meta_link(
-				'wpPiratesSearch_settings_link',
-				__('Go to Settings', self::TEXTDOMAIN),
-				admin_url('options-general.php?page=wpPiratesSearch'),
-				$results_page_hook,
-				array('style' => 'font-weight: bold;')
-			);
-			add_screen_meta_link(
-				'wpPiratesSearch_results_link',
-				__('Go to Search Results', self::TEXTDOMAIN),
-				admin_url('index.php?page=wpPiratesSearch'),
-				$options_page_hook,
-				array('style' => 'font-weight: bold;')
-			);
-		}
-	}
-
-	function options_page(){
-?>
+		?>
 <div class="wrap">
 	<h2><?php _e('Search for pirates', self::TEXTDOMAIN); ?></h2>
 <?php printf( __("<p><strong>Instructions:</strong> Default settings are sufficient for 99%% of sites. Please note that the increase in value increases the load on the server of your website.<br/>
@@ -299,6 +356,11 @@ Support page with questions and answers: %s (Please write in Russian or English,
 <?php
 	}
 
+	/** =====================================================================================================
+	* 
+	* 
+	* @return void
+	*/
 	function option_display($args){
 		$opt = $this->get_options();
 
@@ -320,6 +382,11 @@ Support page with questions and answers: %s (Please write in Russian or English,
 		}
 	}
 
+	/** =====================================================================================================
+	* 
+	* 
+	* @return 
+	*/
 	function options_validate($input){
 		$opt = $this->get_options();
 
@@ -349,6 +416,11 @@ Support page with questions and answers: %s (Please write in Russian or English,
 		return $opt;
 	}
 
+	/** =====================================================================================================
+	* 
+	* 
+	* @return void
+	*/
 	function results_page(){
 		global $wpdb;
 
@@ -377,31 +449,58 @@ Support page with questions and answers: %s (Please write in Russian or English,
 			}
 		}
 
-		$select = $wpdb->prepare("SELECT COUNT(*) FROM {$this->db_table} WHERE time > %d", time() - 7 * 24 * 60 * 60);
-		$week_processed = $wpdb->get_var($select);
-		//
-		$select = $wpdb->prepare("SELECT COUNT(*) FROM {$this->db_table} WHERE time > %d", time() - 24 * 60 * 60);
-		$day_processed = $wpdb->get_var($select);
+		//--------------------------------------------------------------
+		// Prepare the list of the tabs
+		//--------------------------------------------------------------
+		$section_names = array(
+			'plagiary'	=> __('Possible plagiaries', self::TEXTDOMAIN),
+			'summary'	=> __('Summary of searches', self::TEXTDOMAIN),
+		);
 ?>
 	<div class="wrap">
 		<h2><?php _e('Search for pirates', self::TEXTDOMAIN); ?></h2>
-		
-		<h3><?php _e('Statistic', self::TEXTDOMAIN); ?></h3>
-		<p><?php printf(_n('Over the last week processed %d article', 'Over the last week processed %d articles', $week_processed, self::TEXTDOMAIN), $week_processed); ?><?php printf(_n(', including the last 24 hours processed %d article.', ', including the last 24 hours processed %d articles.', $day_processed, self::TEXTDOMAIN), $day_processed); ?></p>
-		
-		<h3><?php _e('Search results', self::TEXTDOMAIN); ?></h3>
-		<?php $this->print_result(); ?>
+
+		<script type="text/javascript">jQuery(function($){ $('#tabs').tabs(); });</script>
+		<div id="tabs">
+			<ul class="hide-if-no-js">
+				<?php
+					foreach($section_names as $section_id => $section_name) {
+						printf('<li><a href="#section-%s">%s</a></li>', esc_attr($section_id), $section_name);					
+					}
+				?>
+			</ul>
+			
+			<div id="section-plagiary" class="blc-section">
+				<h3 class="hide-if-js"><?php echo $section_names['plagiary']; ?></h3>
+				<?php $this->print_result(); ?>
+			</div>
+			
+			<div id="section-summary" class="blc-section">
+				<h3 class="hide-if-js"><?php echo $section_names['summary']; ?></h3>
+				<?php $this->print_summary(); ?>
+			</div>
+		</div>
 	</div>
 <?php
 	}
 
-	function shutdown_process(){
+	/** =====================================================================================================
+	* 
+	* 
+	* @return void
+	*/
+	function cron_hook(){
 		$opt = $this->get_options();
 
-		if(!defined('wpPiratesSearch_DEBUG') && $opt['auto_processing'])	$this->cron_process();
+		if(!defined('wpPiratesSearch_DEBUG') && $opt['auto_processing'])	$this->process();
 	}
 
-	function cron_process() {
+	/** =====================================================================================================
+	* 
+	* 
+	* @return void
+	*/
+	function process(){
 		global $wpdb;
 
 		$opt = $this->get_options();
@@ -533,6 +632,11 @@ if(defined('wpPiratesSearch_DEBUG'))	echo htmlspecialchars($insert) . '<br />';
 		}
 	}
 
+	/** =====================================================================================================
+	* 
+	* 
+	* @return 
+	*/
 	function google_check($query) {
 		$url = "http://ajax.googleapis.com/ajax/services/search/web?v=1.0&q=".urlencode($query);
 		$ch = curl_init();
@@ -559,6 +663,11 @@ if(defined('wpPiratesSearch_DEBUG'))	echo htmlspecialchars($insert) . '<br />';
 		return $result_google;
 	}
 
+	/** =====================================================================================================
+	* 
+	* 
+	* @return 
+	*/
 	function yandex_check($query) {
 		$url = "http://xmlsearch.yandex.ru/xmlsearch?query=".str_replace (" ", "%20", $query)."&groupby=attr%3Dd.mode%3Ddeep.groups-on-page%3D10.docs-in-group%3D1";
 		$ch = curl_init();
@@ -598,6 +707,11 @@ if(defined('wpPiratesSearch_DEBUG'))	echo htmlspecialchars($insert) . '<br />';
 		return $result_yandex;
 	}
 
+	/** =====================================================================================================
+	* 
+	* 
+	* @return 
+	*/
 	function yandex_check_status() {
 		$url = "http://xmlsearch.yandex.ru/xmlsearch";
 		$ch = curl_init();
@@ -619,6 +733,11 @@ if(defined('wpPiratesSearch_DEBUG'))	echo htmlspecialchars($insert) . '<br />';
 		}
 	}
 
+	/** =====================================================================================================
+	* 
+	* 
+	* @return 
+	*/
 	function word_count($sentence) {
 		$newsentense = explode(" ", $sentence);
 		$c = 0;
@@ -631,6 +750,11 @@ if(defined('wpPiratesSearch_DEBUG'))	echo htmlspecialchars($insert) . '<br />';
 		return $c;
 	}
 
+	/** =====================================================================================================
+	* 
+	* 
+	* @return 
+	*/
 	function checkcontent($res) {
 		$opt = $this->get_options();
 
@@ -650,6 +774,11 @@ if(defined('wpPiratesSearch_DEBUG'))	echo htmlspecialchars($insert) . '<br />';
 		return false;
 	}
 
+	/** =====================================================================================================
+	* 
+	* 
+	* @return 
+	*/
 	function print_result() {
 		global $wpdb;
 
@@ -740,6 +869,77 @@ if(defined('wpPiratesSearch_DEBUG'))	echo htmlspecialchars($insert) . '<br />';
 		}
 	}
 
+	/** =====================================================================================================
+	* Print the plagiary summary
+	* 
+	* @return void
+	*/
+	function print_summary(){
+		global $wpdb;
+
+		$select = $wpdb->prepare("SELECT COUNT(*) FROM {$this->db_table} WHERE time > %d", time() - 7 * 24 * 60 * 60);
+		$week_processed = $wpdb->get_var($select);
+		//
+		$select = $wpdb->prepare("SELECT COUNT(*) FROM {$this->db_table} WHERE time > %d", time() - 24 * 60 * 60);
+		$day_processed = $wpdb->get_var($select);
+
+		<p><?php printf(_n('Over the last week processed %d article', 'Over the last week processed %d articles', $week_processed, self::TEXTDOMAIN), $week_processed); printf(_n(', including the last 24 hours processed %d article.', ', including the last 24 hours processed %d articles.', $day_processed, self::TEXTDOMAIN), $day_processed); ?></p>
+
+		
+		// $select = "SELECT searchengine, COUNT(DISTINCT searchtext) FROM {$this->db_table} GROUP BY searchengine";
+		// $numberofsearch = $wpdb->get_results($select);
+		$select = "SELECT COUNT(DISTINCT searchtext) FROM {$this->db_table}";
+		$numberofsearch = $wpdb->get_var($select);
+		?>
+		<h4><?php _e('Macro summary', self::TEXTDOMAIN); ?></h4>
+		<div style="clear: both;padding-top:10px;">
+			<label style="float:left;width:450px;text-align:left;padding-right:6px;" for="settings_post_status_pending"><?php _e('Number of searched sentences against Google: ', self::TEXTDOMAIN); ?></label> 
+			<div style="float:left;"><?php echo $numberofsearch; ?></div>
+		</div>
+		<?php
+		$select = "SELECT COUNT(DISTINCT postid) FROM {$this->db_table}";
+		$numberofsearch = $wpdb->get_var($select);
+		?>
+		<div style="clear: both;padding-top:10px;">
+			<label style="float:left;width:450px;text-align:left;padding-right:6px;" for="settings_post_status_pending"><?php _e('Number of articles checked: ', self::TEXTDOMAIN); ?></label> 
+			<div style="float:left;"><?php echo $numberofsearch; ?></div>
+		</div>
+		<?php
+		
+		?>
+		<br/>
+		<form method="post" action="#section-summary">
+			<div style="clear: both;padding-top:10px;text-align:left;">
+				<h4><?php _e('Force a search', self::TEXTDOMAIN); ?></h4>
+				<p><?php _e('If you want to force a check against Google to be sure that the search is working properly, please click on the button.', self::TEXTDOMAIN); ?></p>
+				<p><?php _e('Note that only one random sentence in a random article will be searched', self::TEXTDOMAIN); ?></p>
+				<p class="submit"><input type="hidden" name="force_search" value="true" /><input type="submit" name="submit" value="<?php _e('Force a search against Google &raquo;', self::TEXTDOMAIN); ?>" /></p>
+				<?php
+				if(isset($_POST['force_search'])){
+					echo "<b>" . __('Result:', self::TEXTDOMAIN) . "</b><br/>" ; 
+					$this->process('force');
+				}
+				?>
+			</div>
+		</form>
+		<br/>
+
+		<h4><?php _e('Detailled summary', self::TEXTDOMAIN); ?></h4>
+		<p><?php _e('Show the last 20 articles and the number of searched sentences', self::TEXTDOMAIN); ?></p>
+		<?php
+		$posts = get_posts('numberposts=20');
+		
+		foreach ($posts as $post) {
+			$select = "SELECT COUNT(DISTINCT searchtext) FROM {$this->db_table} WHERE postid = '{$post->ID}'";
+			$numberofsearch = $wpdb->get_var($select);
+			?>
+			<div style="clear: both;padding-top:10px;color:#999999;">
+				<label style="float:left;width:450px;text-align:left;padding-right:6px;" for="settings_post_status_pending"><?php echo $post->post_title; ?>: </label> 
+				<div style="float:left;"><?php echo $numberofsearch; ?></div>
+			</div>
+			<?php
+		}
+	}
 } // Class wpPiratesSearch
 
 } // if class_exists...
