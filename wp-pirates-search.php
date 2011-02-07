@@ -882,10 +882,10 @@ if(defined('wpPiratesSearch_DEBUG'))	echo htmlspecialchars($insert) . '<br />';
 		//
 		$select = $wpdb->prepare("SELECT COUNT(*) FROM {$this->db_table} WHERE time > %d", time() - 24 * 60 * 60);
 		$day_processed = $wpdb->get_var($select);
-
+		?>
 		<p><?php printf(_n('Over the last week processed %d article', 'Over the last week processed %d articles', $week_processed, self::TEXTDOMAIN), $week_processed); printf(_n(', including the last 24 hours processed %d article.', ', including the last 24 hours processed %d articles.', $day_processed, self::TEXTDOMAIN), $day_processed); ?></p>
 
-		
+		<?php
 		// $select = "SELECT searchengine, COUNT(DISTINCT searchtext) FROM {$this->db_table} GROUP BY searchengine";
 		// $numberofsearch = $wpdb->get_results($select);
 		$select = "SELECT COUNT(DISTINCT searchtext) FROM {$this->db_table}";
