@@ -26,6 +26,7 @@ Default settings are sufficient for 99% of sites.
 = Localizations =
 * English (en_EN)
 * Russian (ru_RU)
+* French (fr_FR)
 
 Is your native language missing? Translating the plugin is easy if you understand english and are fluent in another language. Just use file `lang/wp-pirates-search.pot` as template to make new translation. And, please, send it to me by e-mail...
 
