@@ -2,9 +2,9 @@
 Contributors: limych, sedLex
 Donate link: http://khrolenok.ru/en/wp-pirates-search/
 Tags: plugin, plagiarism, piracy, articles, plagiary, google, yandex, admin, posts, pages, administration, automatic, content, notification
-Requires at least: 2.8
+Requires at least: 3.0
 Tested up to: 3.0.5
-Stable tag: 1.0.2
+Stable tag: 1.0.3
 
 This plugin allows you to find the pirates who coping articles from your website.
 
@@ -41,6 +41,7 @@ Is your native language missing? Translating the plugin is easy if you understan
 == Screenshots ==
 
 1. Administration interface. Plugin configuration page (WordPress 3.0.4)
+1. Administration interface. Plugin summary report (WordPress 3.0.5)
 
 == Frequently Asked Questions ==
 
@@ -50,9 +51,13 @@ Visit http://khrolenok.ru/en/wp-pirates-search/
 
 == Changelog ==
 
+= 1.0.3 =
+* Eric Gruson (author of previous version of this plugin, named "Plagiat Search") joined to developing plugin.
+* Added detailed summary report of processing.
+
 = 1.0.2 =
 * Fixed some minor bugs.
-* Added statistical report of pages processing.
+* Added brief summary report of processing.
 
 = 1.0.1 =
 * Fixed some minor bugs.

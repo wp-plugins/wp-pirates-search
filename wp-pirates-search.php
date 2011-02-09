@@ -3,8 +3,8 @@
 Plugin Name: WP Pirates Search
 Plugin URI: http://khrolenok.ru/en/wp-pirates-search/
 Description: This plugin allows you to find the pirates who coping articles from your website.
-Version: 1.0.2
-Author: Andrey Khrolenok
+Version: 1.0.3
+Author: Andrey Khrolenok & Eric Gruson
 Author URI: http://khrolenok.ru/en/
 License: GPL3
 */
@@ -53,12 +53,12 @@ class wpPiratesSearch {
 		add_action('admin_menu',	array(&$this, 'admin_menu'));	// Admin Panel Page
 
 		// *** Filters ***********************************************
-		  // None
+		add_filter('the_content',	array(&$this, 'hidden_marker')) ;
 
 		// *** Install and Uninstall *********************************
 		register_activation_hook(__FILE__, array(&$this, 'install'));
 		// register_deactivation_hook(__FILE__, array(&$this, 'uninstall'));
-		
+
 		if(false){
 			// Plugin Name of the plugin/theme
 			__('WP Pirates Search', 'wp-pirates-search');
@@ -75,7 +75,7 @@ class wpPiratesSearch {
 
 	/** =====================================================================================================
 	* Translate the plugin...
-	* 
+	*
 	* @return void
 	*/
 	function init_textdomain(){
@@ -90,7 +90,7 @@ class wpPiratesSearch {
 
 	/** =====================================================================================================
 	* In order to install the plugin, few things are to be done ...
-	* 
+	*
 	* @return void
 	*/
 	function install(){
@@ -188,7 +188,7 @@ class wpPiratesSearch {
 
 	/** =====================================================================================================
 	* In order to uninstall the plugin, few things are to be done ...
-	* 
+	*
 	* @return void
 	*/
 	function plagiatSearch_uninstall () {
@@ -197,7 +197,7 @@ class wpPiratesSearch {
 
 	/** =====================================================================================================
 	* Load options of the plugin
-	* 
+	*
 	* @return array list of options
 	*/
 	function get_options(){
@@ -216,8 +216,8 @@ class wpPiratesSearch {
 	}
 
 	/** =====================================================================================================
-	* Initialize the plugin 
-	* 
+	* Initialize the plugin
+	*
 	* @return void
 	*/
 	function admin_init(){
@@ -230,7 +230,7 @@ class wpPiratesSearch {
 
 	/** =====================================================================================================
 	* Create the submenus in "Dashboard" and "Options" menus with the number of possible plagiaries found
-	* 
+	*
 	* @return void
 	*/
 	function admin_menu(){
@@ -273,21 +273,21 @@ class wpPiratesSearch {
 
 	/** =====================================================================================================
 	* Inject CSS and JS script into the head of the page (only admin one)
-	* 
+	*
 	* @return void
 	*/
 	function admin_styles(){
 		wp_enqueue_style('wpPiratesSearch-css');
-		wp_enqueue_script('jquery');   
-		wp_enqueue_script('jquery-ui-core');   
+		wp_enqueue_script('jquery');
+		wp_enqueue_script('jquery-ui-core');
 		wp_enqueue_script('jquery-ui-dialog');
 		wp_enqueue_script('jquery-ui-tabs');
-		echo '<script type="text/javascript"> addLoadEvent = function(func){if(typeof jQuery!="undefined")jQuery(document).ready(func);else if(typeof wpOnload!="function"){wpOnload=func;}else{var oldonload=wpOnload;wpOnload=function(){oldonload();func();}}};</script>' ; 
+		echo '<script type="text/javascript"> addLoadEvent = function(func){if(typeof jQuery!="undefined")jQuery(document).ready(func);else if(typeof wpOnload!="function"){wpOnload=func;}else{var oldonload=wpOnload;wpOnload=function(){oldonload();func();}}};</script>' ;
 	}
 
 	/** =====================================================================================================
-	* 
-	* 
+	*
+	*
 	* @return void
 	*/
 	function options_page(){
@@ -356,8 +356,8 @@ Support page with questions and answers: %s (Please write in Russian or English,
 	}
 
 	/** =====================================================================================================
-	* 
-	* 
+	*
+	*
 	* @return void
 	*/
 	function option_display($args){
@@ -382,9 +382,9 @@ Support page with questions and answers: %s (Please write in Russian or English,
 	}
 
 	/** =====================================================================================================
-	* 
-	* 
-	* @return 
+	*
+	*
+	* @return
 	*/
 	function options_validate($input){
 		$opt = $this->get_options();
@@ -416,8 +416,8 @@ Support page with questions and answers: %s (Please write in Russian or English,
 	}
 
 	/** =====================================================================================================
-	* 
-	* 
+	*
+	*
 	* @return void
 	*/
 	function results_page(){
@@ -464,16 +464,16 @@ Support page with questions and answers: %s (Please write in Russian or English,
 			<ul class="hide-if-no-js">
 				<?php
 					foreach($section_names as $section_id => $section_name) {
-						printf('<li><a href="#section-%s">%s</a></li>', esc_attr($section_id), $section_name);					
+						printf('<li><a href="#section-%s">%s</a></li>', esc_attr($section_id), $section_name);
 					}
 				?>
 			</ul>
-			
+
 			<div id="section-plagiary" class="blc-section">
 				<h3 class="hide-if-js"><?php echo $section_names['plagiary']; ?></h3>
 				<?php $this->print_result(); ?>
 			</div>
-			
+
 			<div id="section-summary" class="blc-section">
 				<h3 class="hide-if-js"><?php echo $section_names['summary']; ?></h3>
 				<?php $this->print_summary(); ?>
@@ -484,8 +484,8 @@ Support page with questions and answers: %s (Please write in Russian or English,
 	}
 
 	/** =====================================================================================================
-	* 
-	* 
+	*
+	*
 	* @return void
 	*/
 	function cron_hook(){
@@ -495,8 +495,8 @@ Support page with questions and answers: %s (Please write in Russian or English,
 	}
 
 	/** =====================================================================================================
-	* 
-	* 
+	*
+	*
 	* @return void
 	*/
 	function process(){
@@ -632,9 +632,9 @@ if(defined('wpPiratesSearch_DEBUG'))	echo htmlspecialchars($insert) . '<br />';
 	}
 
 	/** =====================================================================================================
-	* 
-	* 
-	* @return 
+	*
+	*
+	* @return
 	*/
 	function google_check($query) {
 		$url = "http://ajax.googleapis.com/ajax/services/search/web?v=1.0&q=".urlencode($query);
@@ -663,9 +663,9 @@ if(defined('wpPiratesSearch_DEBUG'))	echo htmlspecialchars($insert) . '<br />';
 	}
 
 	/** =====================================================================================================
-	* 
-	* 
-	* @return 
+	*
+	*
+	* @return
 	*/
 	function yandex_check($query) {
 		$url = "http://xmlsearch.yandex.ru/xmlsearch?query=".str_replace (" ", "%20", $query)."&groupby=attr%3Dd.mode%3Ddeep.groups-on-page%3D10.docs-in-group%3D1";
@@ -707,9 +707,9 @@ if(defined('wpPiratesSearch_DEBUG'))	echo htmlspecialchars($insert) . '<br />';
 	}
 
 	/** =====================================================================================================
-	* 
-	* 
-	* @return 
+	*
+	*
+	* @return
 	*/
 	function yandex_check_status() {
 		$url = "http://xmlsearch.yandex.ru/xmlsearch";
@@ -733,9 +733,9 @@ if(defined('wpPiratesSearch_DEBUG'))	echo htmlspecialchars($insert) . '<br />';
 	}
 
 	/** =====================================================================================================
-	* 
-	* 
-	* @return 
+	*
+	*
+	* @return
 	*/
 	function word_count($sentence) {
 		$newsentense = explode(" ", $sentence);
@@ -750,9 +750,9 @@ if(defined('wpPiratesSearch_DEBUG'))	echo htmlspecialchars($insert) . '<br />';
 	}
 
 	/** =====================================================================================================
-	* 
-	* 
-	* @return 
+	*
+	*
+	* @return
 	*/
 	function checkcontent($res) {
 		$opt = $this->get_options();
@@ -774,9 +774,9 @@ if(defined('wpPiratesSearch_DEBUG'))	echo htmlspecialchars($insert) . '<br />';
 	}
 
 	/** =====================================================================================================
-	* 
-	* 
-	* @return 
+	*
+	*
+	* @return
 	*/
 	function print_result() {
 		global $wpdb;
@@ -870,7 +870,7 @@ if(defined('wpPiratesSearch_DEBUG'))	echo htmlspecialchars($insert) . '<br />';
 
 	/** =====================================================================================================
 	* Print the plagiary summary
-	* 
+	*
 	* @return void
 	*/
 	function print_summary(){
@@ -916,7 +916,7 @@ if(defined('wpPiratesSearch_DEBUG'))	echo htmlspecialchars($insert) . '<br />';
 			<?php
 		}
 		echo '&nbsp;';
-		
+
 		/* Temproraly switched off
 		if(false){
 		?>
@@ -927,7 +927,7 @@ if(defined('wpPiratesSearch_DEBUG'))	echo htmlspecialchars($insert) . '<br />';
 		<p class="submit"><input type="hidden" name="force_search" value="true" /><input type="submit" name="submit" value="<?php _e('Force a search against Google &raquo;', 'wp-pirates-search'); ?>" /></p>
 		<?php
 		if(isset($_POST['force_search'])){
-			echo "<b>" . __('Result:', 'wp-pirates-search') . "</b><br/>" ; 
+			echo "<b>" . __('Result:', 'wp-pirates-search') . "</b><br/>" ;
 			$this->process('force');
 		}
 		?>
@@ -945,12 +945,28 @@ if(defined('wpPiratesSearch_DEBUG'))	echo htmlspecialchars($insert) . '<br />';
 			$numberofsearch = $wpdb->get_var($select);
 			?>
 			<div class="summary-line" style="color:#999;">
-				<span class="summary-title"><?php echo $post->post_title; ?>: </span>
+				<span class="summary-title"><?php echo $post->post_title; ?></span>
 				<span class="summary-value"><?php echo $numberofsearch; ?></span>
 			</div>
 			<?php
 		}
 		echo '&nbsp;';
+	}
+
+	/** =====================================================================================================
+	* Insert Fingerprint into posts
+	*
+	* @return string the new content
+	*/
+	function hidden_marker($content){
+		global $post;
+
+		$output = $content;
+		$key = 'copyright-' . preg_replace("|[/\.]+|", '_', preg_replace("|^.+://|", '', home_url()))/* . '-' . mysql2date('ymd', $post->post_date)/**/;
+		foreach(preg_split("/[\s,]+/", 'p ul ol li span h1 h2 h3 h4 h5 h6 h7 strong blockquote div') as $tag){
+			$output = str_replace("<{$tag}>", "<{$tag} class='{$key}'>", $output);
+		}
+		return $output;
 	}
 } // Class wpPiratesSearch
 

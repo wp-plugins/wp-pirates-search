@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: WP Pirates Search 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-02-09 10:55+0300\n"
-"PO-Revision-Date: 2011-02-09 10:58+0300\n"
+"PO-Revision-Date: 2011-02-09 13:46+0300\n"
 "Last-Translator: Andrey Khrolenok <andrey@khrolenok.ru>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -205,7 +205,7 @@ msgstr "Проверено статей за последние 24 часа:"
 #: wp-pirates-search.php:913
 #, php-format
 msgid "Number of searched sentences against %s: "
-msgstr "Проверено поисковых запросов через %s:"
+msgstr "Непустых результатов поиска через %s:"
 
 #: wp-pirates-search.php:938
 msgid "Detailled summary"
