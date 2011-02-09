@@ -55,6 +55,7 @@ Visit http://khrolenok.ru/en/wp-pirates-search/
 = 1.0.3 =
 * Eric Gruson (author of previous version of this plugin, named "Plagiat Search") joined to developing plugin.
 * Added detailed summary report of processing.
+* French localization added.
 
 = 1.0.2 =
 * Fixed some minor bugs.
