@@ -1,8 +1,8 @@
 === WP Pirates Search ===
-Contributors: limych
+Contributors: limych, sedLex
 Donate link: http://khrolenok.ru/en/wp-pirates-search/
 Tags: plugin, plagiarism, piracy, articles, plagiary, google, yandex, admin, posts, pages, administration, automatic, content, notification
-Requires at least: 2.7
+Requires at least: 2.8
 Tested up to: 3.0.4
 Stable tag: 1.0.2
 

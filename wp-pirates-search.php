@@ -7,6 +7,8 @@ Version: 1.0.2
 Author: Andrey Khrolenok
 Author URI: http://khrolenok.ru/en/
 License: GPL3
+TextDomain:	wp-pirates-search
+DomainPath: /lang
 */
 
 if(file_exists(dirname(__FILE__) . '/flag-DEBUG')){
@@ -30,7 +32,6 @@ if(!class_exists('wpPiratesSearch')){
 
 class wpPiratesSearch {
 	const DB_VERSION	= 1;
-	const TEXTDOMAIN	= 'wp-pirates-search';
 
 	var $db_table		= '';
 
@@ -59,18 +60,19 @@ class wpPiratesSearch {
 		// *** Install and Uninstall *********************************
 		register_activation_hook(__FILE__, array(&$this, 'install'));
 		// register_deactivation_hook(__FILE__, array(&$this, 'uninstall'));
-		
+
+		// Translation hooks
 		if(false){
-			// Plugin Name of the plugin/theme
-			__('WP Pirates Search', self::TEXTDOMAIN);
-			// Plugin URI of the plugin/theme
-			__('http://khrolenok.ru/en/wp-pirates-search/', self::TEXTDOMAIN);
-			// Description of the plugin/theme
-			__('This plugin allows you to find the pirates who coping articles from your website.', self::TEXTDOMAIN);
-			// Author of the plugin/theme
-			__('Andrey Khrolenok', self::TEXTDOMAIN);
-			// Author URI of the plugin/theme
-			__('http://khrolenok.ru/en/', self::TEXTDOMAIN);
+			// Name of the plugin
+			__('WP Pirates Search', 'wp-pirates-search');
+			// URI of the plugin
+			__('http://khrolenok.ru/en/wp-pirates-search/', 'wp-pirates-search');
+			// Description of the plugin
+			__('This plugin allows you to find the pirates who coping articles from your website.', 'wp-pirates-search');
+			// Author of the plugin
+			__('Andrey Khrolenok', 'wp-pirates-search');
+			// Author URI of the plugin
+			__('http://khrolenok.ru/en/', 'wp-pirates-search');
 		}
     }
 
@@ -82,9 +84,9 @@ class wpPiratesSearch {
 	function init_textdomain(){
 		if(function_exists('load_plugin_textdomain')){
 			if(!defined('WP_PLUGIN_DIR')){
-				load_plugin_textdomain(self::TEXTDOMAIN, str_replace(ABSPATH, '', dirname(__FILE__)) . '/lang');
+				load_plugin_textdomain('wp-pirates-search', str_replace(ABSPATH, '', dirname(__FILE__)) . '/lang');
 			}else{
-				load_plugin_textdomain(self::TEXTDOMAIN, false, dirname(plugin_basename(__FILE__)) . '/lang');
+				load_plugin_textdomain('wp-pirates-search', false, dirname(plugin_basename(__FILE__)) . '/lang');
 			}
 		}
 	}
@@ -192,7 +194,7 @@ class wpPiratesSearch {
 	* 
 	* @return void
 	*/
-	function plagiatSearch_uninstall () {
+	function uninstall(){
 		// wp_clear_scheduled_hook(array(&$this, 'cron_hook'));
 	}
 
@@ -242,13 +244,13 @@ class wpPiratesSearch {
 			$nbPlagiat = $wpdb->get_var($select);
 
 			if($nbPlagiat == 0){
-				$results_page_hook = add_submenu_page('index.php', __('Search for pirates', self::TEXTDOMAIN), __('Search for pirates', self::TEXTDOMAIN), 6, 'wpPiratesSearch', array(&$this, 'results_page'));
+				$results_page_hook = add_submenu_page('index.php', __('Search for pirates', 'wp-pirates-search'), __('Search for pirates', 'wp-pirates-search'), 6, 'wpPiratesSearch', array(&$this, 'results_page'));
 			} else {
-				$results_page_hook = add_submenu_page('index.php', __('Search for pirates', self::TEXTDOMAIN), __('Search for pirates', self::TEXTDOMAIN) . ' <span class=\'update-plugins count-1\' title=\'' . sprintf( _n('%d pirated copy possible', '%d pirated copies possibles', $nbPlagiat, self::TEXTDOMAIN), $nbPlagiat) . '\'><span class=\'update-count\'>'.$nbPlagiat.'</span></span>', 6, 'wpPiratesSearch', array(&$this, 'results_page'));
+				$results_page_hook = add_submenu_page('index.php', __('Search for pirates', 'wp-pirates-search'), __('Search for pirates', 'wp-pirates-search') . ' <span class=\'update-plugins count-1\' title=\'' . sprintf( _n('%d pirated copy possible', '%d pirated copies possibles', $nbPlagiat, 'wp-pirates-search'), $nbPlagiat) . '\'><span class=\'update-count\'>'.$nbPlagiat.'</span></span>', 6, 'wpPiratesSearch', array(&$this, 'results_page'));
 			}
 		}
 
-		$options_page_hook = add_options_page(__('Search for pirates', self::TEXTDOMAIN), __('Search for pirates', self::TEXTDOMAIN), 'manage_options', 'wpPiratesSearch', array(&$this, 'options_page'));
+		$options_page_hook = add_options_page(__('Search for pirates', 'wp-pirates-search'), __('Search for pirates', 'wp-pirates-search'), 'manage_options', 'wpPiratesSearch', array(&$this, 'options_page'));
 
 		// Using registered $page handle to hook stylesheet loading
 		add_action('admin_print_styles-' . $results_page_hook, array(&$this, 'admin_styles'));
@@ -257,14 +259,14 @@ class wpPiratesSearch {
 		if(function_exists('add_screen_meta_link')){
 			add_screen_meta_link(
 				'wpPiratesSearch_settings_link',
-				__('Go to Settings', self::TEXTDOMAIN),
+				__('Go to Settings', 'wp-pirates-search'),
 				admin_url('options-general.php?page=wpPiratesSearch'),
 				$results_page_hook,
 				array('style' => 'font-weight: bold;')
 			);
 			add_screen_meta_link(
 				'wpPiratesSearch_results_link',
-				__('Go to Search Results', self::TEXTDOMAIN),
+				__('Go to Search Results', 'wp-pirates-search'),
 				admin_url('index.php?page=wpPiratesSearch'),
 				$options_page_hook,
 				array('style' => 'font-weight: bold;')
@@ -292,61 +294,61 @@ class wpPiratesSearch {
 	* @return void
 	*/
 	function options_page(){
-		add_settings_section('wpPiratesSearch', __('Main Settings', self::TEXTDOMAIN), create_function('', ''), 'wpPiratesSearch');
-		add_settings_field('post_at_once', __('Check posts at once for one time', self::TEXTDOMAIN), array(&$this, 'option_display'), 'wpPiratesSearch', 'wpPiratesSearch', array(
+		add_settings_section('wpPiratesSearch', __('Main Settings', 'wp-pirates-search'), create_function('', ''), 'wpPiratesSearch');
+		add_settings_field('post_at_once', __('Check posts at once for one time', 'wp-pirates-search'), array(&$this, 'option_display'), 'wpPiratesSearch', 'wpPiratesSearch', array(
 			'type'		=> 'number',
 			'id'		=> 'post_at_once',
 			'size'		=> 1,
 			'maxlength'	=> 2,
-			'description'	=> sprintf(__('(Recomended value is %d)', self::TEXTDOMAIN), 1),
+			'description'	=> sprintf(__('(Recomended value is %d)', 'wp-pirates-search'), 1),
 		));
-		add_settings_field('sentence_from_post', __('Amount of sentences from one post', self::TEXTDOMAIN), array(&$this, 'option_display'), 'wpPiratesSearch', 'wpPiratesSearch', array(
+		add_settings_field('sentence_from_post', __('Amount of sentences from one post', 'wp-pirates-search'), array(&$this, 'option_display'), 'wpPiratesSearch', 'wpPiratesSearch', array(
 			'type'		=> 'number',
 			'id'		=> 'sentence_from_post',
 			'size'		=> 1,
 			'maxlength'	=> 2,
-			'description'	=> sprintf(__('(Recomended value is %d)', self::TEXTDOMAIN), 3),
+			'description'	=> sprintf(__('(Recomended value is %d)', 'wp-pirates-search'), 3),
 		));
-		add_settings_field('words_in_result', __('Amount of words one by one in result for compare', self::TEXTDOMAIN), array(&$this, 'option_display'), 'wpPiratesSearch', 'wpPiratesSearch', array(
+		add_settings_field('words_in_result', __('Amount of words one by one in result for compare', 'wp-pirates-search'), array(&$this, 'option_display'), 'wpPiratesSearch', 'wpPiratesSearch', array(
 			'type'		=> 'number',
 			'id'		=> 'words_in_result',
 			'size'		=> 1,
 			'maxlength'	=> 2,
-			'description'	=> sprintf(__('(Recomended value is %d)', self::TEXTDOMAIN), 8),
+			'description'	=> sprintf(__('(Recomended value is %d)', 'wp-pirates-search'), 8),
 		));
-		add_settings_field('check_cache_time', __('Check posts again every (hours)', self::TEXTDOMAIN), array(&$this, 'option_display'), 'wpPiratesSearch', 'wpPiratesSearch', array(
+		add_settings_field('check_cache_time', __('Check posts again every (hours)', 'wp-pirates-search'), array(&$this, 'option_display'), 'wpPiratesSearch', 'wpPiratesSearch', array(
 			'type'		=> 'number',
 			'id'		=> 'check_cache_time',
 			'size'		=> 1,
 			'maxlength'	=> 2,
-			'description'	=> sprintf(__('(Recomended value is %d)', self::TEXTDOMAIN), 48),
+			'description'	=> sprintf(__('(Recomended value is %d)', 'wp-pirates-search'), 48),
 		));
-		add_settings_field('post_status_pending', __('Check only pending posts', self::TEXTDOMAIN), array(&$this, 'option_display'), 'wpPiratesSearch', 'wpPiratesSearch', array(
+		add_settings_field('post_status_pending', __('Check only pending posts', 'wp-pirates-search'), array(&$this, 'option_display'), 'wpPiratesSearch', 'wpPiratesSearch', array(
 			'type'		=> 'checkbox',
 			'id'		=> 'post_status_pending',
 		));
-		add_settings_field('searchengine_yandex', __('Include searchengine yandex.ru?', self::TEXTDOMAIN), array(&$this, 'option_display'), 'wpPiratesSearch', 'wpPiratesSearch', array(
+		add_settings_field('searchengine_yandex', __('Include searchengine yandex.ru?', 'wp-pirates-search'), array(&$this, 'option_display'), 'wpPiratesSearch', 'wpPiratesSearch', array(
 			'type'		=> 'checkbox',
 			'id'		=> 'searchengine_yandex',
 			'description'	=> $this->yandex_check_status(),
 		));
-		add_settings_field('ignore_sites', __('Filter sites (one site in one line) which should not be displayed', self::TEXTDOMAIN), array(&$this, 'option_display'), 'wpPiratesSearch', 'wpPiratesSearch', array(
+		add_settings_field('ignore_sites', __('Filter sites (one site in one line) which should not be displayed', 'wp-pirates-search'), array(&$this, 'option_display'), 'wpPiratesSearch', 'wpPiratesSearch', array(
 			'type'		=> 'textarea',
 			'id'		=> 'ignore_sites',
 			'rows'		=> 4,
 			'cols'		=> 50,
 		));
-		add_settings_field('auto_processing', __('Use automatic start processing', self::TEXTDOMAIN), array(&$this, 'option_display'), 'wpPiratesSearch', 'wpPiratesSearch', array(
+		add_settings_field('auto_processing', __('Use automatic start processing', 'wp-pirates-search'), array(&$this, 'option_display'), 'wpPiratesSearch', 'wpPiratesSearch', array(
 			'type'		=> 'checkbox',
 			'id'		=> 'auto_processing',
-			'description'	=> sprintf(__('Not recomended for sites with high traffic.<br />(If not checked, periodically fetch page <a href="%1$s">%1$s</a> for processing new part of posts.)', self::TEXTDOMAIN), WP_PLUGIN_URL . '/' . dirname(plugin_basename(__FILE__)) . '/process.php'),
+			'description'	=> sprintf(__('Not recomended for sites with high traffic.<br />(If not checked, periodically fetch page <a href="%1$s">%1$s</a> for processing new part of posts.)', 'wp-pirates-search'), WP_PLUGIN_URL . '/' . dirname(plugin_basename(__FILE__)) . '/process.php'),
 		));
 
 		?>
 <div class="wrap">
-	<h2><?php _e('Search for pirates', self::TEXTDOMAIN); ?></h2>
+	<h2><?php _e('Search for pirates', 'wp-pirates-search'); ?></h2>
 <?php printf( __("<p><strong>Instructions:</strong> Default settings are sufficient for 99%% of sites. Please note that the increase in value increases the load on the server of your website.<br/>
-Support page with questions and answers: %s (Please write in Russian or English, or use Google Translator for other languages)</p>", self::TEXTDOMAIN), '<a href="http://khrolenok.ru/wp-pirates-search/" target="_blank">http://khrolenok.ru/wp-pirates-search/</a>'); ?>
+Support page with questions and answers: %s (Please write in Russian or English, or use Google Translator for other languages)</p>", 'wp-pirates-search'), '<a href="http://khrolenok.ru/wp-pirates-search/" target="_blank">http://khrolenok.ru/wp-pirates-search/</a>'); ?>
 	<form method="post" action="options.php">
 		<?php settings_fields('wpPiratesSearch_options'); ?>
 		<?php do_settings_sections('wpPiratesSearch'); ?>
@@ -392,16 +394,16 @@ Support page with questions and answers: %s (Please write in Russian or English,
 
 		// Integer values
 		$val = intval($input['post_at_once']);
-		if($val < 1)		add_settings_error('post_at_once', 'error', __('Value of posts can not be less than 1.', self::TEXTDOMAIN));
+		if($val < 1)		add_settings_error('post_at_once', 'error', __('Value of posts can not be less than 1.', 'wp-pirates-search'));
 		else 	$opt['post_at_once'] = $val;
 		$val = intval($input['sentence_from_post']);
-		if($val < 1)		add_settings_error('sentence_from_post', 'error', __('Value of sentences can not be less than 1.', self::TEXTDOMAIN));
+		if($val < 1)		add_settings_error('sentence_from_post', 'error', __('Value of sentences can not be less than 1.', 'wp-pirates-search'));
 		else 	$opt['sentence_from_post'] = $val;
 		$val = intval($input['words_in_result']);
-		if($val < 1)		add_settings_error('words_in_result', 'error', __('Value of words can not be less than 1.', self::TEXTDOMAIN));
+		if($val < 1)		add_settings_error('words_in_result', 'error', __('Value of words can not be less than 1.', 'wp-pirates-search'));
 		else 	$opt['words_in_result'] = $val;
 		$val = intval($input['check_cache_time']);
-		if($val < 1)		add_settings_error('check_cache_time', 'error', __('Value hours can not be less than 1.', self::TEXTDOMAIN));
+		if($val < 1)		add_settings_error('check_cache_time', 'error', __('Value hours can not be less than 1.', 'wp-pirates-search'));
 		else 	$opt['check_cache_time'] = $val;
 		//
 		// Boolean values
@@ -453,12 +455,12 @@ Support page with questions and answers: %s (Please write in Russian or English,
 		// Prepare the list of the tabs
 		//--------------------------------------------------------------
 		$section_names = array(
-			'plagiary'	=> __('Possible plagiaries', self::TEXTDOMAIN),
-			'summary'	=> __('Summary of searches', self::TEXTDOMAIN),
+			'plagiary'	=> __('Possible plagiaries', 'wp-pirates-search'),
+			'summary'	=> __('Summary of searches', 'wp-pirates-search'),
 		);
 ?>
 	<div class="wrap">
-		<h2><?php _e('Search for pirates', self::TEXTDOMAIN); ?></h2>
+		<h2><?php _e('Search for pirates', 'wp-pirates-search'); ?></h2>
 
 		<script type="text/javascript">jQuery(function($){ $('#tabs').tabs(); });</script>
 		<div id="tabs">
@@ -727,9 +729,9 @@ if(defined('wpPiratesSearch_DEBUG'))	echo htmlspecialchars($insert) . '<br />';
 		if (preg_match("!<request>(.*?)</request>!si",$xml,$request)) $request=$request[1];
 
 		if(!empty($request)){
-			return __("Yandex ready", self::TEXTDOMAIN);
+			return __("Yandex ready", 'wp-pirates-search');
 		}else{
-			return sprintf(__('Yandex status: %1$d <a href="%2$s" target="_blank">Set/Change your server IP here, need for search by yandex.</a>', self::TEXTDOMAIN), $error, "http://xml.yandex.ru/ip.xml");
+			return sprintf(__('Yandex status: %1$d <a href="%2$s" target="_blank">Set/Change your server IP here, need for search by yandex.</a>', 'wp-pirates-search'), $error, "http://xml.yandex.ru/ip.xml");
 		}
 	}
 
@@ -826,7 +828,7 @@ if(defined('wpPiratesSearch_DEBUG'))	echo htmlspecialchars($insert) . '<br />';
 	<div id="site-<?php echo ++$site_num; ?>" class="postbox">
 		<h2><span><a href="<?php echo post_permalink($postid); ?>" target="_blank"><?php echo $post->post_title; ?></a></span></h2>
 		<div class="inside">
-		  <p><a href="<?php echo $action_url; ?>postid=<?php echo $postid; ?>&status=3" style="font-size:90%;color:#006400"><?php _e("Don't search for plagiarism for this post", self::TEXTDOMAIN); ?></a></p>
+		  <p><a href="<?php echo $action_url; ?>postid=<?php echo $postid; ?>&status=3" style="font-size:90%;color:#006400"><?php _e("Don't search for plagiarism for this post", 'wp-pirates-search'); ?></a></p>
 		  <ul>
 	<?php
 		foreach($printresult as $url => $res){
@@ -836,7 +838,7 @@ if(defined('wpPiratesSearch_DEBUG'))	echo htmlspecialchars($insert) . '<br />';
 			<a href="<?php echo $url; ?>" target="_blank"><?php echo $url; ?></a>
 				<?php
 				if(!empty($site->cacheurl)){
-					echo "(<a href='{$site->cacheurl}' target='_blank'>" . __('CACHE', self::TEXTDOMAIN) . '</a>)';
+					echo "(<a href='{$site->cacheurl}' target='_blank'>" . __('CACHE', 'wp-pirates-search') . '</a>)';
 				}
 				?>
 				</div>
@@ -845,13 +847,13 @@ if(defined('wpPiratesSearch_DEBUG'))	echo htmlspecialchars($insert) . '<br />';
 				<br />
 				<div>
 			<?php if ($site->status != 'legal') { ?>
-				<a href="<?php echo $action_url; ?>id=<?php echo $site->id?>&status=2" style="font-size:90%;color:#006400"><?php _e('This is not plagiarism', self::TEXTDOMAIN); ?></a>
+				<a href="<?php echo $action_url; ?>id=<?php echo $site->id?>&status=2" style="font-size:90%;color:#006400"><?php _e('This is not plagiarism', 'wp-pirates-search'); ?></a>
 			<?php } ?>
 			<?php if ($site->status != 'pirated') { ?>
-				<a href="<?php echo $action_url; ?>id=<?php echo $site->id?>&status=1" style="font-size:90%;color:#8B0000"><?php _e('It is a plagiarism', self::TEXTDOMAIN); ?></a>
+				<a href="<?php echo $action_url; ?>id=<?php echo $site->id?>&status=1" style="font-size:90%;color:#8B0000"><?php _e('It is a plagiarism', 'wp-pirates-search'); ?></a>
 			<?php } ?>
 			<?php if ($site->status != 'legal') { ?>
-				<a href="<?php echo $action_url; ?>id=<?php echo $site->id?>&status=0" style="font-size:90%;color:#000000"><?php _e('Plagiarism corrected', self::TEXTDOMAIN); ?></a>
+				<a href="<?php echo $action_url; ?>id=<?php echo $site->id?>&status=0" style="font-size:90%;color:#000000"><?php _e('Plagiarism corrected', 'wp-pirates-search'); ?></a>
 			<?php } ?>
 				</div>
 			</li>
@@ -865,7 +867,7 @@ if(defined('wpPiratesSearch_DEBUG'))	echo htmlspecialchars($insert) . '<br />';
 			}
 		}
 		else {
-			print "<p>" . __('No posts matching found.', self::TEXTDOMAIN) . "</p>";
+			print "<p>" . __('No posts matching found.', 'wp-pirates-search') . "</p>";
 		}
 	}
 
@@ -883,7 +885,7 @@ if(defined('wpPiratesSearch_DEBUG'))	echo htmlspecialchars($insert) . '<br />';
 		$select = $wpdb->prepare("SELECT COUNT(*) FROM {$this->db_table} WHERE time > %d", time() - 24 * 60 * 60);
 		$day_processed = $wpdb->get_var($select);
 
-		<p><?php printf(_n('Over the last week processed %d article', 'Over the last week processed %d articles', $week_processed, self::TEXTDOMAIN), $week_processed); printf(_n(', including the last 24 hours processed %d article.', ', including the last 24 hours processed %d articles.', $day_processed, self::TEXTDOMAIN), $day_processed); ?></p>
+		<p><?php printf(_n('Over the last week processed %d article', 'Over the last week processed %d articles', $week_processed, 'wp-pirates-search'), $week_processed); printf(_n(', including the last 24 hours processed %d article.', ', including the last 24 hours processed %d articles.', $day_processed, 'wp-pirates-search'), $day_processed); ?></p>
 
 		
 		// $select = "SELECT searchengine, COUNT(DISTINCT searchtext) FROM {$this->db_table} GROUP BY searchengine";
@@ -891,9 +893,9 @@ if(defined('wpPiratesSearch_DEBUG'))	echo htmlspecialchars($insert) . '<br />';
 		$select = "SELECT COUNT(DISTINCT searchtext) FROM {$this->db_table}";
 		$numberofsearch = $wpdb->get_var($select);
 		?>
-		<h4><?php _e('Macro summary', self::TEXTDOMAIN); ?></h4>
+		<h4><?php _e('Macro summary', 'wp-pirates-search'); ?></h4>
 		<div style="clear: both;padding-top:10px;">
-			<label style="float:left;width:450px;text-align:left;padding-right:6px;" for="settings_post_status_pending"><?php _e('Number of searched sentences against Google: ', self::TEXTDOMAIN); ?></label> 
+			<label style="float:left;width:450px;text-align:left;padding-right:6px;" for="settings_post_status_pending"><?php _e('Number of searched sentences against Google: ', 'wp-pirates-search'); ?></label> 
 			<div style="float:left;"><?php echo $numberofsearch; ?></div>
 		</div>
 		<?php
@@ -901,7 +903,7 @@ if(defined('wpPiratesSearch_DEBUG'))	echo htmlspecialchars($insert) . '<br />';
 		$numberofsearch = $wpdb->get_var($select);
 		?>
 		<div style="clear: both;padding-top:10px;">
-			<label style="float:left;width:450px;text-align:left;padding-right:6px;" for="settings_post_status_pending"><?php _e('Number of articles checked: ', self::TEXTDOMAIN); ?></label> 
+			<label style="float:left;width:450px;text-align:left;padding-right:6px;" for="settings_post_status_pending"><?php _e('Number of articles checked: ', 'wp-pirates-search'); ?></label> 
 			<div style="float:left;"><?php echo $numberofsearch; ?></div>
 		</div>
 		<?php
@@ -910,13 +912,13 @@ if(defined('wpPiratesSearch_DEBUG'))	echo htmlspecialchars($insert) . '<br />';
 		<br/>
 		<form method="post" action="#section-summary">
 			<div style="clear: both;padding-top:10px;text-align:left;">
-				<h4><?php _e('Force a search', self::TEXTDOMAIN); ?></h4>
-				<p><?php _e('If you want to force a check against Google to be sure that the search is working properly, please click on the button.', self::TEXTDOMAIN); ?></p>
-				<p><?php _e('Note that only one random sentence in a random article will be searched', self::TEXTDOMAIN); ?></p>
-				<p class="submit"><input type="hidden" name="force_search" value="true" /><input type="submit" name="submit" value="<?php _e('Force a search against Google &raquo;', self::TEXTDOMAIN); ?>" /></p>
+				<h4><?php _e('Force a search', 'wp-pirates-search'); ?></h4>
+				<p><?php _e('If you want to force a check against Google to be sure that the search is working properly, please click on the button.', 'wp-pirates-search'); ?></p>
+				<p><?php _e('Note that only one random sentence in a random article will be searched', 'wp-pirates-search'); ?></p>
+				<p class="submit"><input type="hidden" name="force_search" value="true" /><input type="submit" name="submit" value="<?php _e('Force a search against Google &raquo;', 'wp-pirates-search'); ?>" /></p>
 				<?php
 				if(isset($_POST['force_search'])){
-					echo "<b>" . __('Result:', self::TEXTDOMAIN) . "</b><br/>" ; 
+					echo "<b>" . __('Result:', 'wp-pirates-search') . "</b><br/>" ; 
 					$this->process('force');
 				}
 				?>
@@ -924,8 +926,8 @@ if(defined('wpPiratesSearch_DEBUG'))	echo htmlspecialchars($insert) . '<br />';
 		</form>
 		<br/>
 
-		<h4><?php _e('Detailled summary', self::TEXTDOMAIN); ?></h4>
-		<p><?php _e('Show the last 20 articles and the number of searched sentences', self::TEXTDOMAIN); ?></p>
+		<h4><?php _e('Detailled summary', 'wp-pirates-search'); ?></h4>
+		<p><?php _e('Show the last 20 articles and the number of searched sentences', 'wp-pirates-search'); ?></p>
 		<?php
 		$posts = get_posts('numberposts=20');
 		
@@ -941,6 +943,81 @@ if(defined('wpPiratesSearch_DEBUG'))	echo htmlspecialchars($insert) . '<br />';
 		}
 	}
 } // Class wpPiratesSearch
+
+	protected var $seModules = array();
+
+	/** =====================================================================================================
+	* 
+	* 
+	* @return void
+	*/
+	protected function load_modules(){
+		$relative_path = '/' . plugin_basename(realpath(dirname(__FILE__) . '/se-modules'));
+		if(!function_exists('get_plugins')){
+			//BUG: Potentional security flaw/bug. plugin.php is not meant to be loaded outside admin panel
+			require_once(ABSPATH . 'wp-admin/includes/plugin.php'); 
+		}
+		$modules = get_plugins($relative_path);
+		foreach($modules as $module_filename => $module_header){
+			$module_id = strtolower(basename($module_filename, '.php'));
+@			// $this->seModules[$module_id] = (object) array(
+				// 'name'		=> $module_header['Name'],
+				// 'instance'	=> $moduleInstance,
+			// );
+		}
+	}
+
+	/** =====================================================================================================
+	* 
+	* 
+	* @return void
+	*/
+	public function register_module($moduleId, $moduleName, $moduleInstance){
+		$this->seModules[$moduleId] = (object) array(
+			'id'		=> $moduleId,
+			'name'		=> $moduleName,
+			'instance'	=> $moduleInstance,
+		);
+	}
+} // if class_exists...
+
+
+
+if(!class_exists('wpPiratesSearch_SEModule')){
+
+abstract class wpPiratesSearch_SEModule {
+
+	protected const SEName	= '';
+
+	/** =====================================================================================================
+	* 
+	* 
+	* @return 
+	*/
+	abstract public function check_query($query);
+
+	/** =====================================================================================================
+	* 
+	* 
+	* @return 
+	*/
+	abstract public function options_section();
+
+	/** =====================================================================================================
+	* 
+	* 
+	* @return stdClass
+	*/
+	protected static function make_result($queryText, $foundUrl, $foundText, $seCacheUrl = ''){
+		return (object) array(
+			'searchEngine'	=> self::SEName,
+			'queryText'		=> $queryText,
+			'foundUrl'		=> $foundUrl,
+			'foundText'		=> $foundText,
+			'seCacheUrl'	=> $seCacheUrl,
+		);
+	}
+} // Class wpPiratesSearch_SEModule
 
 } // if class_exists...
 
