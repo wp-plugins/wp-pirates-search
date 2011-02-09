@@ -7,6 +7,8 @@ Version: 1.0.3
 Author: Andrey Khrolenok & Eric Gruson
 Author URI: http://khrolenok.ru/en/
 License: GPL3
+TextDomain:	wp-pirates-search
+DomainPath: /lang
 */
 
 if(file_exists(dirname(__FILE__) . '/flag-DEBUG')){
@@ -67,7 +69,7 @@ class wpPiratesSearch {
 			// Description of the plugin/theme
 			__('This plugin allows you to find the pirates who coping articles from your website.', 'wp-pirates-search');
 			// Author of the plugin/theme
-			__('Andrey Khrolenok', 'wp-pirates-search');
+			__('Andrey Khrolenok & Eric Gruson', 'wp-pirates-search');
 			// Author URI of the plugin/theme
 			__('http://khrolenok.ru/en/', 'wp-pirates-search');
 		}

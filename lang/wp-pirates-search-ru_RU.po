@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WP Pirates Search 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-09 10:55+0300\n"
-"PO-Revision-Date: 2011-02-09 13:46+0300\n"
+"POT-Creation-Date: 2011-02-09 14:35+0300\n"
+"PO-Revision-Date: 2011-02-09 14:35+0300\n"
 "Last-Translator: Andrey Khrolenok <andrey@khrolenok.ru>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -36,8 +36,8 @@ msgid "This plugin allows you to find the pirates who coping articles from your 
 msgstr "Плагин позволяет находить пиратов, которые копируют статьи с вашего сайта."
 
 #: wp-pirates-search.php:70
-msgid "Andrey Khrolenok"
-msgstr "Андрей Хроленок"
+msgid "Andrey Khrolenok & Eric Gruson"
+msgstr "Андрей Хроленок и Эрик Грюсон"
 
 #: wp-pirates-search.php:72
 msgid "http://khrolenok.ru/en/"
@@ -207,11 +207,11 @@ msgstr "Проверено статей за последние 24 часа:"
 msgid "Number of searched sentences against %s: "
 msgstr "Непустых результатов поиска через %s:"
 
-#: wp-pirates-search.php:938
+#: wp-pirates-search.php:939
 msgid "Detailled summary"
 msgstr "Детальная статистика"
 
-#: wp-pirates-search.php:939
+#: wp-pirates-search.php:940
 msgid "Show the last 20 articles and the number of searched sentences"
 msgstr "Показаны последние 20 статей и число проверенных поисковых запросов"
 
