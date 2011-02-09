@@ -888,7 +888,7 @@ if(defined('wpPiratesSearch_DEBUG'))	echo htmlspecialchars($insert) . '<br />';
 		</div>
 		<?php
 		//
-		$select = $wpdb->prepare("SELECT COUNT(*) FROM {$this->db_table} WHERE time > %d", time() - 7 * 24 * 60 * 60);
+		$select = $wpdb->prepare("SELECT COUNT(DISTINCT postid) FROM {$this->db_table} WHERE time > %d", time() - 7 * 24 * 60 * 60);
 		$numberofsearch = $wpdb->get_var($select);
 		?>
 		<div class="summary-line">
@@ -897,7 +897,7 @@ if(defined('wpPiratesSearch_DEBUG'))	echo htmlspecialchars($insert) . '<br />';
 		</div>
 		<?php
 		//
-		$select = $wpdb->prepare("SELECT COUNT(*) FROM {$this->db_table} WHERE time > %d", time() - 24 * 60 * 60);
+		$select = $wpdb->prepare("SELECT COUNT(DISTINCT postid) FROM {$this->db_table} WHERE time > %d", time() - 24 * 60 * 60);
 		$numberofsearch = $wpdb->get_var($select);
 		?>
 		<div class="summary-line">
