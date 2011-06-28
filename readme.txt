@@ -1,7 +1,7 @@
 === WP Pirates Search ===
 Contributors: limych, sedLex
 Donate link: http://khrolenok.ru/en/wp-pirates-search/
-Tags: plugin, plagiarism, piracy, articles, plagiary, google, yandex, admin, posts, pages, administration, automatic, content, notification
+Tags: plugin, plagiarism, piracy, articles, plagiary, google, yandex, admin, posts, pages, administration, automatic, content, notification, repost, search, steal, stolen, text
 Requires at least: 3.0
 Tested up to: 3.0.5
 Stable tag: 1.0.3
@@ -53,7 +53,7 @@ Visit http://khrolenok.ru/en/wp-pirates-search/
 == Changelog ==
 
 = 1.0.3 =
-* Eric Gruson (author of previous version of this plugin, named "Plagiat Search") joined to developing plugin.
+* SedLex (author of previous version of this plugin, named "Plagiat Search") joined to developing plugin.
 * Added detailed summary report of processing.
 * French localization added.
 

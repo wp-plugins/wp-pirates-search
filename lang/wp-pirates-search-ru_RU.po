@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WP Pirates Search 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-09 14:35+0300\n"
-"PO-Revision-Date: 2011-02-09 14:35+0300\n"
+"POT-Creation-Date: 2011-06-28 15:06+0300\n"
+"PO-Revision-Date: 2011-06-28 16:10+0300\n"
 "Last-Translator: Andrey Khrolenok <andrey@khrolenok.ru>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -23,35 +23,35 @@ msgstr ""
 "X-Textdomain-Support: yes\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: wp-pirates-search.php:64
+#: wp-pirates-search.php:75
 msgid "WP Pirates Search"
 msgstr "WP Pirates Search"
 
-#: wp-pirates-search.php:66
+#: wp-pirates-search.php:77
 msgid "http://khrolenok.ru/en/wp-pirates-search/"
 msgstr "http://khrolenok.ru/wp-pirates-search/"
 
-#: wp-pirates-search.php:68
+#: wp-pirates-search.php:79
 msgid "This plugin allows you to find the pirates who coping articles from your website."
 msgstr "Плагин позволяет находить пиратов, которые копируют статьи с вашего сайта."
 
-#: wp-pirates-search.php:70
+#: wp-pirates-search.php:81
 msgid "Andrey Khrolenok & Eric Gruson"
 msgstr "Андрей Хроленок и Эрик Грюсон"
 
-#: wp-pirates-search.php:72
+#: wp-pirates-search.php:83
 msgid "http://khrolenok.ru/en/"
 msgstr "http://khrolenok.ru/"
 
-#: wp-pirates-search.php:244
-#: wp-pirates-search.php:246
-#: wp-pirates-search.php:250
-#: wp-pirates-search.php:346
-#: wp-pirates-search.php:460
+#: wp-pirates-search.php:307
+#: wp-pirates-search.php:309
+#: wp-pirates-search.php:313
+#: wp-pirates-search.php:415
+#: wp-pirates-search.php:530
 msgid "Search for pirates"
 msgstr "Поиск пиратов"
 
-#: wp-pirates-search.php:246
+#: wp-pirates-search.php:309
 #, php-format
 msgid "%d pirated copy possible"
 msgid_plural "%d pirated copies possibles"
@@ -59,161 +59,185 @@ msgstr[0] "%d случай пиратства"
 msgstr[1] "%d случая пиратства"
 msgstr[2] "%d случаев пиратства"
 
-#: wp-pirates-search.php:259
+#: wp-pirates-search.php:324
 msgid "Go to Settings"
 msgstr "К настройкам"
 
-#: wp-pirates-search.php:266
+#: wp-pirates-search.php:331
 msgid "Go to Search Results"
 msgstr "К результатам поиска"
 
-#: wp-pirates-search.php:294
+#: wp-pirates-search.php:358
+#, php-format
+msgid "(Recomended value is %s)"
+msgstr "(Рекомендуемое значение: %s)"
+
+#: wp-pirates-search.php:359
 msgid "Main Settings"
 msgstr "Основные настройки"
 
-#: wp-pirates-search.php:295
+#: wp-pirates-search.php:360
 msgid "Check posts at once for one time"
 msgstr "Проверять статей  за одну попытку"
 
-#: wp-pirates-search.php:300
-#: wp-pirates-search.php:307
-#: wp-pirates-search.php:314
-#: wp-pirates-search.php:321
-#, php-format
-msgid "(Recomended value is %d)"
-msgstr "(Рекомендуемое значение: %d)"
+#: wp-pirates-search.php:365
+msgid "Please note that the increase in this value increases the load on the server of your website."
+msgstr "Пожалуйста учитывайте, что увеличение значения увеличивает нагрузку на Ваш сервер."
 
-#: wp-pirates-search.php:302
-msgid "Amount of sentences from one post"
-msgstr "Число предложений для поиска из одной статьи"
-
-#: wp-pirates-search.php:309
+#: wp-pirates-search.php:367
 msgid "Amount of words one by one in result for compare"
 msgstr "Число совпадающих слов в результате"
 
-#: wp-pirates-search.php:316
+#: wp-pirates-search.php:372
+msgid "The smaller the value, the greater is the number of results, but less accurate search."
+msgstr "Чем меньше значение, тем больше результатов поиска, но хуже его точность."
+
+#: wp-pirates-search.php:374
 msgid "Check posts again every (hours)"
 msgstr "Проверять статьи повторно каждые (часов)"
 
-#: wp-pirates-search.php:323
-msgid "Check only pending posts"
-msgstr "Проверять только ожидающие публикацию статьи"
+#: wp-pirates-search.php:381
+msgid "Expire cache after (days)"
+msgstr "Удалять кэш после (дней)"
 
-#: wp-pirates-search.php:327
-msgid "Include searchengine yandex.ru?"
-msgstr "Искать также через Яндекс?"
+#: wp-pirates-search.php:386
+msgid "How many days search results will be considered relevant."
+msgstr "Как долго считать результаты поиска актуальными."
 
-#: wp-pirates-search.php:332
+#: wp-pirates-search.php:388
 msgid "Filter sites (one site in one line) which should not be displayed"
 msgstr "Список сайтов (по одному на строку) которые не должны отображаться"
 
-#: wp-pirates-search.php:338
+#: wp-pirates-search.php:394
 msgid "Use automatic start processing"
 msgstr "Автоматически запускать обработку"
 
-#: wp-pirates-search.php:341
+#: wp-pirates-search.php:397
 #, php-format
 msgid "Not recomended for sites with high traffic.<br />(If not checked, periodically fetch page <a href=\"%1$s\">%1$s</a> for processing new part of posts.)"
 msgstr "Не рекомендуется для сайтов с большой посещаемостью.<br />(Если не включено, периодически открывайте страницу <a href=\"%1$s\">%1$s</a> для обработки очередной порции записей.)"
 
-#: wp-pirates-search.php:347
+#: wp-pirates-search.php:400
+msgid "Additional Settings"
+msgstr "Дополнительные настройки"
+
+#: wp-pirates-search.php:401
+msgid "Check only pending posts"
+msgstr "Проверять только ожидающие публикацию статьи"
+
+#: wp-pirates-search.php:405
+msgid "Disable internal Google search API"
+msgstr "Отключить встроенный поиск через Google"
+
+#: wp-pirates-search.php:408
+msgid "Use only if another search engine API was added by separate plugin."
+msgstr "Используйте только, если Вы отдельным плагином подключили другой поисковый интерфейс."
+
+#: wp-pirates-search.php:416
 #, php-format
 msgid ""
-"<p><strong>Instructions:</strong> Default settings are sufficient for 99%% of sites. Please note that the increase in value increases the load on the server of your website.<br/>\n"
+"<p><strong>Instructions:</strong> Default settings are sufficient for 99%% of sites.<br/>\n"
 "Support page with questions and answers: %s (Please write in Russian or English, or use Google Translator for other languages)</p>"
 msgstr ""
-"<p><strong>Инструкции:</strong> Настройки по-умолчанию достаточны для 99%% сайтов. Учитывайте, что увеличение значений повышает нагрузку на сервер Вашего сайта.<br/>\n"
+"<p><strong>Инструкции:</strong> Настройки по-умолчанию достаточны для 99%% сайтов.<br/>\n"
 "Страница поддержки с вопросами и ответами: %s</p>"
 
-#: wp-pirates-search.php:352
+#: wp-pirates-search.php:421
 msgid "Save Changes"
 msgstr "Сохранить изменения"
 
-#: wp-pirates-search.php:394
+#: wp-pirates-search.php:463
 msgid "Value of posts can not be less than 1."
 msgstr "Число статей  не должно быть меньше 1."
 
-#: wp-pirates-search.php:397
-msgid "Value of sentences can not be less than 1."
-msgstr "Число предложений не должно быть меньше 1."
-
-#: wp-pirates-search.php:400
+#: wp-pirates-search.php:466
 msgid "Value of words can not be less than 1."
 msgstr "Число слов не должно быть меньше 1."
 
-#: wp-pirates-search.php:403
+#: wp-pirates-search.php:469
 msgid "Value hours can not be less than 1."
 msgstr "Число часов не должно быть меньше 1."
 
-#: wp-pirates-search.php:455
+#: wp-pirates-search.php:525
 msgid "Possible plagiaries"
 msgstr "Возможный плагиат"
 
-#: wp-pirates-search.php:456
+#: wp-pirates-search.php:526
 msgid "Summary of searches"
 msgstr "Статистика поиска"
 
-#: wp-pirates-search.php:729
-msgid "Yandex ready"
-msgstr "Яндекс настроен"
-
-#: wp-pirates-search.php:731
-#, php-format
-msgid "Yandex status: %1$d <a href=\"%2$s\" target=\"_blank\">Set/Change your server IP here, need for search by yandex.</a>"
-msgstr "Статус Яндекса: %1$d <a href=\"%2$s\" target=\"_blank\">Установите/Измените IP Вашего сервера тут — это необходимо для поиска через Яндекс.</a>"
-
-#: wp-pirates-search.php:828
-msgid "Don't search for plagiarism for this post"
-msgstr "Не искать плагиат для этой статьи"
-
-#: wp-pirates-search.php:838
-msgid "CACHE"
-msgstr "ИЗ КЭША"
-
-#: wp-pirates-search.php:847
-msgid "This is not plagiarism"
-msgstr "Это не плагиат"
-
-#: wp-pirates-search.php:850
-msgid "It is a plagiarism"
-msgstr "Это плагиат"
-
-#: wp-pirates-search.php:853
-msgid "Plagiarism corrected"
-msgstr "Плагиат исправлен"
-
-#: wp-pirates-search.php:867
+#: wp-pirates-search.php:771
 msgid "No posts matching found."
 msgstr "Ничего не найдено."
 
-#: wp-pirates-search.php:882
+#: wp-pirates-search.php:790
+msgid "Don't search for plagiarism for this post"
+msgstr "Не искать плагиат для этой статьи"
+
+#: wp-pirates-search.php:802
+msgid "CACHE"
+msgstr "ИЗ КЭША"
+
+#: wp-pirates-search.php:810
+msgid "This is not plagiarism"
+msgstr "Это не плагиат"
+
+#: wp-pirates-search.php:813
+msgid "It is a plagiarism"
+msgstr "Это плагиат"
+
+#: wp-pirates-search.php:816
+msgid "Plagiarism corrected"
+msgstr "Плагиат исправлен"
+
+#: wp-pirates-search.php:840
 msgid "Macro summary"
 msgstr "Общая статистика"
 
-#: wp-pirates-search.php:884
+#: wp-pirates-search.php:842
+msgid "Search engines are now used to search for pirates: "
+msgstr "Поисковые системы, через которые сейчас ведётся поиск:"
+
+#: wp-pirates-search.php:846
 msgid "Total number of articles checked: "
 msgstr "Общее число проверенных статей:"
 
-#: wp-pirates-search.php:893
+#: wp-pirates-search.php:855
 msgid "Checked articles last week: "
 msgstr "Проверено статей за последнюю неделю:"
 
-#: wp-pirates-search.php:902
+#: wp-pirates-search.php:864
 msgid "Checked articles last 24 hours: "
 msgstr "Проверено статей за последние 24 часа:"
 
-#: wp-pirates-search.php:913
-#, php-format
-msgid "Number of searched sentences against %s: "
-msgstr "Непустых результатов поиска через %s:"
+#~ msgid "Amount of sentences from one post"
+#~ msgstr "Число предложений для поиска из одной статьи"
 
-#: wp-pirates-search.php:939
-msgid "Detailled summary"
-msgstr "Детальная статистика"
+#~ msgid "Include searchengine yandex.ru?"
+#~ msgstr "Искать также через Яндекс?"
 
-#: wp-pirates-search.php:940
-msgid "Show the last 20 articles and the number of searched sentences"
-msgstr "Показаны последние 20 статей и число проверенных поисковых запросов"
+#~ msgid "Value of sentences can not be less than 1."
+#~ msgstr "Число предложений не должно быть меньше 1."
+
+#~ msgid "Yandex ready"
+#~ msgstr "Яндекс настроен"
+
+#~ msgid ""
+#~ "Yandex status: %1$d <a href=\"%2$s\" target=\"_blank\">Set/Change your "
+#~ "server IP here, need for search by yandex.</a>"
+#~ msgstr ""
+#~ "Статус Яндекса: %1$d <a href=\"%2$s\" target=\"_blank\">Установите/"
+#~ "Измените IP Вашего сервера тут — это необходимо для поиска через Яндекс.</"
+#~ "a>"
+
+#~ msgid "Number of searched sentences against %s: "
+#~ msgstr "Непустых результатов поиска через %s:"
+
+#~ msgid "Detailled summary"
+#~ msgstr "Детальная статистика"
+
+#~ msgid "Show the last 20 articles and the number of searched sentences"
+#~ msgstr "Показаны последние 20 статей и число проверенных поисковых запросов"
 
 #~ msgid "Statistic"
 #~ msgstr "Статистика"

@@ -1,5 +1,5 @@
 
-.wpPiratesSearch-none	{
+.wpPiratesSearch-found	{
 	background: #FF0;
 }
 
@@ -7,13 +7,13 @@
 	background: #EFE;
 }
 
-.wpPiratesSearch-pirated	{
+.wpPiratesSearch-warned	{
 	background: #FEE;
 }
 
-.wpPiratesSearch-none,
+.wpPiratesSearch-found,
 .wpPiratesSearch-legal,
-.wpPiratesSearch-pirated	{
+.wpPiratesSearch-warned	{
 	padding: 0.5em 1em;
 }
 

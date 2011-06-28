@@ -3,8 +3,8 @@
 Plugin Name: WP Pirates Search
 Plugin URI: http://khrolenok.ru/en/wp-pirates-search/
 Description: This plugin allows you to find the pirates who coping articles from your website.
-Version: 1.0.3
-Author: Andrey Khrolenok & Eric Gruson
+Version: 2.0.0
+Author: Andrey Khrolenok & SedLex
 Author URI: http://khrolenok.ru/en/
 License: GPL3
 TextDomain:	wp-pirates-search
@@ -31,9 +31,10 @@ function postscompare_get_options(){
 if(!class_exists('wpPiratesSearch')){
 
 class wpPiratesSearch {
-	const DB_VERSION	= 1;
+	const DB_VERSION	= 2;
 
 	var $db_table		= '';
+	var $searchengines	= NULL;
 
   /**
    * wpPiratesSearch::wpPiratesSearch()
@@ -47,15 +48,23 @@ class wpPiratesSearch {
         global $wpdb;
 
 		$this->db_table = $wpdb->prefix . 'pirates_search';
+		
+		$opt = $this->get_options();
 
 		// *** Actions ***********************************************
-		add_action('init',			array(&$this, 'init_textdomain'));
+		add_action('init',			array(&$this, 'init_plugin'));
+		add_action('plugins_loaded',	array(&$this, 'update_check'));
 		add_action('shutdown',		array(&$this, 'cron_hook'));
 		add_action('admin_init',	array(&$this, 'admin_init'));	// Admin Panel Init
 		add_action('admin_menu',	array(&$this, 'admin_menu'));	// Admin Panel Page
 
 		// *** Filters ***********************************************
 		add_filter('the_content',	array(&$this, 'hidden_marker')) ;
+		//
+		if(!$opt['disable_internal_search']){
+			add_filter('wpps_init_search',		array(&$this, 'google_init')) ;
+			add_filter('wpps_do_search',		array(&$this, 'google_search'), 10, 4) ;
+		}
 
 		// *** Install and Uninstall *********************************
 		register_activation_hook(__FILE__, array(&$this, 'install'));
@@ -80,7 +89,7 @@ class wpPiratesSearch {
 	*
 	* @return void
 	*/
-	function init_textdomain(){
+	function init_plugin(){
 		if(function_exists('load_plugin_textdomain')){
 			if(!defined('WP_PLUGIN_DIR')){
 				load_plugin_textdomain('wp-pirates-search', str_replace(ABSPATH, '', dirname(__FILE__)) . '/lang');
@@ -88,6 +97,9 @@ class wpPiratesSearch {
 				load_plugin_textdomain('wp-pirates-search', false, dirname(plugin_basename(__FILE__)) . '/lang');
 			}
 		}
+		
+		// Initialize search engines
+		$this->searchengines = apply_filters('wpps_init_search', array());
 	}
 
 	/** =====================================================================================================
@@ -97,7 +109,7 @@ class wpPiratesSearch {
 	*/
 	function install(){
 		global $wpdb;
-		static $statuses = array('none', 'pirated', 'legal', 'ignore');
+		static $statuses = array('found', 'warned', 'legal', 'ignore');
 
 		$installed_ver = get_option('wpPiratesSearch_db_version');
 
@@ -105,16 +117,16 @@ class wpPiratesSearch {
 			// Creating new DB table for plugin
 			$sql = "CREATE TABLE {$this->db_table} (
 				id MEDIUMINT(9) NOT NULL AUTO_INCREMENT,
-				postid BIGINT(11) DEFAULT '0' NOT NULL,
-				status ENUM('none', 'pirated', 'legal', 'ignore') DEFAULT 'none' NOT NULL,
-				searchtext TINYTEXT,
-				searchengine VARCHAR(50),
-				resulttext TEXT,
-				url VARCHAR(255) NOT NULL,
-				cacheurl VARCHAR(255),
-				time BIGINT(11) DEFAULT '0' NOT NULL,
-				UNIQUE KEY id (id)
-			);";
+				post_id BIGINT(11) DEFAULT '0' NOT NULL,
+				found_url VARCHAR(255) NOT NULL,
+				query_text VARCHAR(255) NOT NULL,
+				found_time BIGINT(11) DEFAULT '0' NOT NULL,
+				status ENUM('found', 'warned', 'legal', 'ignore') DEFAULT 'found' NOT NULL,
+				service_url VARCHAR(255),
+				found_text TEXT,
+				PRIMARY KEY (id),
+				UNIQUE KEY found_url (post_id, found_url, query_text)
+			) DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ;";
 
 			require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 			dbDelta($sql);
@@ -177,15 +189,52 @@ class wpPiratesSearch {
 
 		}elseif($installed_ver != self::DB_VERSION){
 			// Updating plugin DB table
-			// $sql = "...";
-
-			// require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-			// dbDelta($sql);
+				// id MEDIUMINT(9) NOT NULL AUTO_INCREMENT,
+				// postid BIGINT(11) DEFAULT '0' NOT NULL,
+				// status ENUM('none', 'pirated', 'legal', 'ignore') DEFAULT 'none' NOT NULL,
+				// searchtext TINYTEXT,
+				// searchengine VARCHAR(50),
+				// resulttext TEXT,
+				// url VARCHAR(255) NOT NULL,
+				// cacheurl VARCHAR(255),
+				// time BIGINT(11) DEFAULT '0' NOT NULL,
+				// UNIQUE KEY id (id)
+			$update = array(
+				"DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci",
+				//
+				"CHANGE postid post_id BIGINT(11) DEFAULT '0' NOT NULL",
+				"CHANGE url found_url VARCHAR(255) NOT NULL AFTER post_id",
+				"CHANGE query_text searchtext VARCHAR(255) NOT NULL AFTER post_id",
+				"CHANGE time found_time BIGINT(11) DEFAULT '0' NOT NULL AFTER query_text",
+				"CHANGE status status ENUM('none', 'pirated', 'found', 'warned', 'legal', 'ignore') DEFAULT 'found' NOT NULL AFTER found_time",
+				"CHANGE cacheurl service_url VARCHAR(255) AFTER status",
+				"CHANGE resulttext found_text TEXT AFTER service_url",
+				"DROP searchengine",
+				//
+				"ADD PRIMARY KEY (id)",
+				"ADD UNIQUE KEY found_url (post_id, found_url, query_text)",
+			);
+			foreach($update as $sql){
+				$wpdb->query("ALTER TABLE {$this->db_table} " . $sql);
+			}
+			$wpdb->query("UPDATE {$this->db_table} SET status = 'found' WHERE status = 'none'");
+			$wpdb->query("UPDATE {$this->db_table} SET status = 'warned' WHERE status = 'pirated'");
+			$wpdb->query("ALTER TABLE {$this->db_table} CHANGE status status ENUM('found', 'warned', 'legal', 'ignore') DEFAULT 'found' NOT NULL");
+			$wpdb->query("ALTER TABLE {$this->db_table} DROP INDEX `id`");
 		}
 
 		update_option('wpPiratesSearch_db_version', self::DB_VERSION);
+	}
 
-		// wp_schedule_event(time(), 'hourly', array(&$this, 'cron_hook'));
+	/** =====================================================================================================
+	*
+	*
+	* @return void
+	*/
+	function update_check(){
+		if(get_option('wpPiratesSearch_db_version') != self::DB_VERSION){
+			$this->install();
+		}
 	}
 
 	/** =====================================================================================================
@@ -193,9 +242,7 @@ class wpPiratesSearch {
 	*
 	* @return void
 	*/
-	function plagiatSearch_uninstall () {
-		// wp_clear_scheduled_hook(array(&$this, 'cron_hook'));
-	}
+	function plagiatSearch_uninstall(){ /* Void function */ }
 
 	/** =====================================================================================================
 	* Load options of the plugin
@@ -205,14 +252,16 @@ class wpPiratesSearch {
 	function get_options(){
 		$opt = get_option('wpPiratesSearch_options');
 
-		if(!isset($opt['post_at_once']))		$opt['post_at_once'] = 1;
-		if(!isset($opt['sentence_from_post']))	$opt['sentence_from_post'] = 3;
-		if(!isset($opt['words_in_result']))		$opt['words_in_result'] = 8;
-		if(!isset($opt['check_cache_time']))	$opt['check_cache_time'] = 48;
-		if(!isset($opt['post_status_pending']))	$opt['post_status_pending'] = 0;
-		if(!isset($opt['searchengine_google']))	$opt['searchengine_google'] = 1;
-		if(!isset($opt['searchengine_yandex']))	$opt['searchengine_yandex'] = 0;
-		if(!isset($opt['auto_processing']))		$opt['auto_processing'] = 0;
+		if(!isset($opt['post_at_once']))			$opt['post_at_once'] = 1;
+		if(!isset($opt['words_in_result']))			$opt['words_in_result'] = 7;
+		if(!isset($opt['check_cache_time']))		$opt['check_cache_time'] = 48;
+		if(!isset($opt['expiration_cache_days']))	$opt['expiration_cache_days'] = 30;
+		if(!isset($opt['post_status_pending']))		$opt['post_status_pending'] = 0;
+		if(!isset($opt['searchengine_google']))		$opt['searchengine_google'] = 1;
+		if(!isset($opt['searchengine_yandex']))		$opt['searchengine_yandex'] = 0;
+		if(!isset($opt['auto_processing']))			$opt['auto_processing'] = 0;
+		if(!isset($opt['place_hidden_marker']))		$opt['place_hidden_marker'] = false;
+		if(!isset($opt['disable_internal_search']))	$opt['disable_internal_search'] = false;
 
 		return $opt;
 	}
@@ -239,8 +288,20 @@ class wpPiratesSearch {
 		if(current_user_can('delete_pages') || current_user_can('delete_posts') || current_user_can('edit_pages') || current_user_can('edit_posts')){
 			global $wpdb;
 
-			$select = "SELECT COUNT(*) FROM {$this->db_table} WHERE status = 'none' AND searchtext IS NOT NULL";
-			$nbPlagiat = $wpdb->get_var($select);
+			$select = "SELECT post_id, COUNT(DISTINCT query_text) AS cnt FROM {$this->db_table} WHERE status = 'found' GROUP BY post_id";
+			$results = $wpdb->get_results($select);
+			$num_of_queries = array();
+			foreach($results as $res){
+				$num_of_queries[$res->post_id] = $res->cnt;
+			}
+
+			$select = "SELECT post_id, found_url, COUNT(DISTINCT query_text) AS rank FROM {$this->db_table} WHERE found_url <> '' AND status = 'found' GROUP BY post_id, found_url";
+			$results = $wpdb->get_results($select);
+			$nbPlagiat = 0;
+			foreach($results as $res){
+				if(($num_of_queries[$res->post_id] >= 5) && (($res->rank * 100 / $num_of_queries[$res->post_id]) > 50))
+					$nbPlagiat++;
+			}
 
 			if($nbPlagiat == 0){
 				$results_page_hook = add_submenu_page('index.php', __('Search for pirates', 'wp-pirates-search'), __('Search for pirates', 'wp-pirates-search'), 6, 'wpPiratesSearch', array(&$this, 'results_page'));
@@ -255,22 +316,23 @@ class wpPiratesSearch {
 		add_action('admin_print_styles-' . $results_page_hook, array(&$this, 'admin_styles'));
 
 		// Make the Settings page link to the results page, and vice versa
-		if(function_exists('add_screen_meta_link')){
-			add_screen_meta_link(
-				'wpPiratesSearch_settings_link',
-				__('Go to Settings', 'wp-pirates-search'),
-				admin_url('options-general.php?page=wpPiratesSearch'),
-				$results_page_hook,
-				array('style' => 'font-weight: bold;')
-			);
-			add_screen_meta_link(
-				'wpPiratesSearch_results_link',
-				__('Go to Search Results', 'wp-pirates-search'),
-				admin_url('index.php?page=wpPiratesSearch'),
-				$options_page_hook,
-				array('style' => 'font-weight: bold;')
-			);
-		}
+		if(!function_exists('add_screen_meta_link'))
+			require_once(dirname(__FILE__) . '\screen-meta-links.php');
+
+		add_screen_meta_link(
+			'wpPiratesSearch_settings_link',
+			__('Go to Settings', 'wp-pirates-search'),
+			admin_url('options-general.php?page=wpPiratesSearch'),
+			$results_page_hook,
+			array('style' => 'background-color: #FF9;')
+		);
+		add_screen_meta_link(
+			'wpPiratesSearch_results_link',
+			__('Go to Search Results', 'wp-pirates-search'),
+			admin_url('index.php?page=wpPiratesSearch'),
+			$options_page_hook,
+			array('style' => 'background-color: #FF9;')
+		);
 	}
 
 	/** =====================================================================================================
@@ -293,43 +355,35 @@ class wpPiratesSearch {
 	* @return void
 	*/
 	function options_page(){
+		$recomended = __('(Recomended value is %s)', 'wp-pirates-search');
 		add_settings_section('wpPiratesSearch', __('Main Settings', 'wp-pirates-search'), create_function('', ''), 'wpPiratesSearch');
 		add_settings_field('post_at_once', __('Check posts at once for one time', 'wp-pirates-search'), array(&$this, 'option_display'), 'wpPiratesSearch', 'wpPiratesSearch', array(
 			'type'		=> 'number',
 			'id'		=> 'post_at_once',
 			'size'		=> 1,
 			'maxlength'	=> 2,
-			'description'	=> sprintf(__('(Recomended value is %d)', 'wp-pirates-search'), 1),
-		));
-		add_settings_field('sentence_from_post', __('Amount of sentences from one post', 'wp-pirates-search'), array(&$this, 'option_display'), 'wpPiratesSearch', 'wpPiratesSearch', array(
-			'type'		=> 'number',
-			'id'		=> 'sentence_from_post',
-			'size'		=> 1,
-			'maxlength'	=> 2,
-			'description'	=> sprintf(__('(Recomended value is %d)', 'wp-pirates-search'), 3),
+			'description'	=> sprintf($recomended, 1) . '<br/>' . __('Please note that the increase in this value increases the load on the server of your website.', 'wp-pirates-search'),
 		));
 		add_settings_field('words_in_result', __('Amount of words one by one in result for compare', 'wp-pirates-search'), array(&$this, 'option_display'), 'wpPiratesSearch', 'wpPiratesSearch', array(
 			'type'		=> 'number',
 			'id'		=> 'words_in_result',
 			'size'		=> 1,
 			'maxlength'	=> 2,
-			'description'	=> sprintf(__('(Recomended value is %d)', 'wp-pirates-search'), 8),
+			'description'	=> sprintf($recomended, '5­-8') . '<br/>' . __('The smaller the value, the greater is the number of results, but less accurate search.', 'wp-pirates-search'),
 		));
 		add_settings_field('check_cache_time', __('Check posts again every (hours)', 'wp-pirates-search'), array(&$this, 'option_display'), 'wpPiratesSearch', 'wpPiratesSearch', array(
 			'type'		=> 'number',
 			'id'		=> 'check_cache_time',
 			'size'		=> 1,
 			'maxlength'	=> 2,
-			'description'	=> sprintf(__('(Recomended value is %d)', 'wp-pirates-search'), 48),
+			'description'	=> sprintf($recomended, 48),
 		));
-		add_settings_field('post_status_pending', __('Check only pending posts', 'wp-pirates-search'), array(&$this, 'option_display'), 'wpPiratesSearch', 'wpPiratesSearch', array(
-			'type'		=> 'checkbox',
-			'id'		=> 'post_status_pending',
-		));
-		add_settings_field('searchengine_yandex', __('Include searchengine yandex.ru?', 'wp-pirates-search'), array(&$this, 'option_display'), 'wpPiratesSearch', 'wpPiratesSearch', array(
-			'type'		=> 'checkbox',
-			'id'		=> 'searchengine_yandex',
-			'description'	=> $this->yandex_check_status(),
+		add_settings_field('expiration_cache_days', __('Expire cache after (days)', 'wp-pirates-search'), array(&$this, 'option_display'), 'wpPiratesSearch', 'wpPiratesSearch', array(
+			'type'		=> 'number',
+			'id'		=> 'expiration_cache_days',
+			'size'		=> 1,
+			'maxlength'	=> 2,
+			'description'	=> sprintf($recomended, 30) . '<br/>' . __('How many days search results will be considered relevant.', 'wp-pirates-search'),
 		));
 		add_settings_field('ignore_sites', __('Filter sites (one site in one line) which should not be displayed', 'wp-pirates-search'), array(&$this, 'option_display'), 'wpPiratesSearch', 'wpPiratesSearch', array(
 			'type'		=> 'textarea',
@@ -342,11 +396,24 @@ class wpPiratesSearch {
 			'id'		=> 'auto_processing',
 			'description'	=> sprintf(__('Not recomended for sites with high traffic.<br />(If not checked, periodically fetch page <a href="%1$s">%1$s</a> for processing new part of posts.)', 'wp-pirates-search'), WP_PLUGIN_URL . '/' . dirname(plugin_basename(__FILE__)) . '/process.php'),
 		));
+		//
+		add_settings_section('wpPiratesSearch_additional', __('Additional Settings', 'wp-pirates-search'), create_function('', ''), 'wpPiratesSearch');
+		add_settings_field('post_status_pending', __('Check only pending posts', 'wp-pirates-search'), array(&$this, 'option_display'), 'wpPiratesSearch', 'wpPiratesSearch_additional', array(
+			'type'		=> 'checkbox',
+			'id'		=> 'post_status_pending',
+		));
+		add_settings_field('disable_internal_search', __('Disable internal Google search API', 'wp-pirates-search'), array(&$this, 'option_display'), 'wpPiratesSearch', 'wpPiratesSearch_additional', array(
+			'type'		=> 'checkbox',
+			'id'		=> 'disable_internal_search',
+			'description'	=> __('Use only if another search engine API was added by separate plugin.', 'wp-pirates-search'),
+		));
+		
+		do_action('wpps_options');
 
 		?>
 <div class="wrap">
 	<h2><?php _e('Search for pirates', 'wp-pirates-search'); ?></h2>
-<?php printf( __("<p><strong>Instructions:</strong> Default settings are sufficient for 99%% of sites. Please note that the increase in value increases the load on the server of your website.<br/>
+	<?php printf( __("<p><strong>Instructions:</strong> Default settings are sufficient for 99%% of sites.<br/>
 Support page with questions and answers: %s (Please write in Russian or English, or use Google Translator for other languages)</p>", 'wp-pirates-search'), '<a href="http://khrolenok.ru/wp-pirates-search/" target="_blank">http://khrolenok.ru/wp-pirates-search/</a>'); ?>
 	<form method="post" action="options.php">
 		<?php settings_fields('wpPiratesSearch_options'); ?>
@@ -395,9 +462,6 @@ Support page with questions and answers: %s (Please write in Russian or English,
 		$val = intval($input['post_at_once']);
 		if($val < 1)		add_settings_error('post_at_once', 'error', __('Value of posts can not be less than 1.', 'wp-pirates-search'));
 		else 	$opt['post_at_once'] = $val;
-		$val = intval($input['sentence_from_post']);
-		if($val < 1)		add_settings_error('sentence_from_post', 'error', __('Value of sentences can not be less than 1.', 'wp-pirates-search'));
-		else 	$opt['sentence_from_post'] = $val;
 		$val = intval($input['words_in_result']);
 		if($val < 1)		add_settings_error('words_in_result', 'error', __('Value of words can not be less than 1.', 'wp-pirates-search'));
 		else 	$opt['words_in_result'] = $val;
@@ -413,6 +477,10 @@ Support page with questions and answers: %s (Please write in Russian or English,
 		//
 		// Text values
 		$opt['ignore_sites'] = $input['ignore_sites'];
+		
+		$tmp = apply_filters('wpps_options_validate', $opt, $input);
+		if(is_array($tmp))
+			$opt = array_merge($opt, $tmp);
 
 		return $opt;
 	}
@@ -433,7 +501,7 @@ Support page with questions and answers: %s (Please write in Russian or English,
 					$wpdb->query( $select );
 					break;
 				case 1:		// It's a plagiarism
-					$select = $wpdb->prepare("UPDATE {$this->db_table} SET status = 'pirated' WHERE id = %d", $_GET['id']);
+					$select = $wpdb->prepare("UPDATE {$this->db_table} SET status = 'warned' WHERE id = %d", $_GET['id']);
 					$wpdb->query( $select );
 					break;
 				case 2:		// It's not a plagiarism
@@ -517,120 +585,77 @@ Support page with questions and answers: %s (Please write in Russian or English,
 		$posts = array_merge($posts, get_posts($args));
 		shuffle($posts);
 
+		$tmp = preg_split("/[\s,;]+/", $_SERVER['HTTP_HOST'] . "\n" . $opt['ignore_sites']);
+		$exclude_sites = array();
+		foreach($tmp as $val){
+			$val = str_replace("http://", "", $val);
+			$val = str_replace("www.", "", $val);
+			if(!empty($val))	$exclude_sites[$val] = 1;
+		}
+		$exclude_sites = array_keys($exclude_sites);
+		
 		$k = 0;
-		$posttitles = $searchengresult = array();
-		foreach ($posts as $post) {
-			$taketime = time() - 3600 * $opt["check_cache_time"];
+		foreach($posts as $post){
+			$taketime = time() - 3600 * $opt['check_cache_time'];
 			$results = 0;
 
-			$select = "SELECT * FROM {$this->db_table} WHERE postid = '{$post->ID}' AND (time > {$taketime} OR status = 'ignore')";
+			$select = $wpdb->prepare("SELECT * FROM {$this->db_table} WHERE post_id = %d AND (found_time > %d OR status = 'ignore')", $post->ID, $taketime);
 			$results = $wpdb->query( $select ) ;
-			if(($results == 0) && ($k < $opt["post_at_once"])) {  // Only "x" records for one time
-				$posttitles[$post->ID] = $post->post_title;
+			if(($results == 0) && ($k < $opt['post_at_once'])) {  // Only "x" records for one time
 if(defined('wpPiratesSearch_DEBUG'))	echo '(' . $post->ID . ') ' . htmlspecialchars($post->post_title) . '<br />';
 				$k++;
-				$c = $d = 0;
-
-				// We suppress the quoted text. . .
-				$withoutquotes = preg_replace('/<blockquote>(.*?\r*?\n*?)*?<\/blockquote>/i', '', $post->post_content);
-
-				$sentences = explode(".", strip_tags($withoutquotes) ) ;
-
-				while($c < $opt['sentence_from_post'] and $d < 200) {
-				  $sentence = $sentences[rand(0, count($sentences) - 1)] ;
-				  if($this->word_count($sentence) >= $opt["words_in_result"]) {
-
-					// Search pirates by Google
-					if($opt['searchengine_google']){
-						if ($resgoogle = $this->google_check($sentence)) {
-						  foreach ($resgoogle as $resnumber => $resdata) {
-							if($this->checkcontent($resdata)) {
-								$searchengresult[$post->ID][$c][$resnumber] = $resdata;
-							} // if
-						  } // foreach
-						} // if
-					} // if
-
-					// Search pirates by Yandex
-					if($opt['searchengine_yandex']){
-						if($resyandex = $this->yandex_check($sentanse)) {
-							foreach ($resyandex as $resnumber => $resdata) {
-								if($this->checkcontent($resdata)) {
-									$searchengresult[$post->ID][$c][$resnumber] = $resdata;
-								} // if
-							} // foreach
-						} // if
-					} // if
-
-					$c++;
-				  } // if
-				  $d++;
-				} // while
-			} // if
-		} // foreach
-
-		if (!empty($searchengresult)) {
-			$nositesneed = array();
-			$sites_filters = explode("\r\n", $opt['sites_filter']);
-			$nositesneed[] = $_SERVER['HTTP_HOST'];
-			foreach ($sites_filters as $sites_filter) {
-				$nositesneed[] = $sites_filter;
-			}
-
-			foreach ($searchengresult as $postid => $result) {
-				foreach ($result as $listofsites) {
-					foreach ($listofsites as $site) {
-					  $select = "SELECT * FROM {$this->db_table} WHERE postid = '{$postid}' and url = '{$site['urls']}'";
-					  $results = $wpdb->query( $select );
-
-					  if($results == 0){
-						// We had if only there is no other entry and it is not on this domain
-						$nomark = false;
-						foreach ($nositesneed as $nositesneed_) {
-							if (!empty($nositesneed_)) {
-								preg_match("/^(http:\/\/)?([^\/]+)/i", $site['urls'], $matches);
-								$nositesneed_ = str_replace("http://", "", $nositesneed_);
-								$nositesneed_ = str_replace("www.", "", $nositesneed_);
-								if(strstr($matches[2], $nositesneed_)){
-								  $nomark = true;
-								  if($nositesneed_ == $_SERVER['HTTP_HOST'])
-									continue 2;
-								  break;
-								}
-							}
+				$terms = $this->get_search_terms($post, $opt['words_in_result']);
+				foreach($terms as $search_term){
+if(defined('wpPiratesSearch_DEBUG'))	echo '<strong>Searching for "' . $search_term . '"</strong><br />';
+					$search_results = apply_filters('wpps_do_search', array(), 'text', $search_term, $exclude_sites);
+					if(!empty($search_results)){
+						$tmp = array();
+						foreach($search_results as $res){
+							$tmp[$res->found_url] = $res;
 						}
+						foreach($tmp as $furl => $res){
+							$update = $wpdb->prepare("UPDATE {$this->db_table} SET found_time = %d, found_text = %s, service_url = %s WHERE post_id = %d AND found_url = %s AND query_text = %s",
+								time(), (string) $res->found_content, (string) $res->cache_url,
+								$post->ID, $furl, $search_term);
+if(defined('wpPiratesSearch_DEBUG'))	echo htmlspecialchars($update) . '<br />';
+							$results = $wpdb->query($update);
+							if($results == 0){
+								$insert = $wpdb->prepare("INSERT INTO {$this->db_table} (post_id, found_url, query_text, found_time, found_text, service_url) " .
+									"VALUES (%d, %s, %s, %d, %s, %s)", $post->ID, $furl, $search_term, time(), (string) $res->found_content, (string) $res->cache_url);
+if(defined('wpPiratesSearch_DEBUG'))	echo htmlspecialchars($insert) . '<br />';
+								$results = $wpdb->query($insert);
+							} // if
+						} // if
+					}else{
+						$update = $wpdb->prepare("UPDATE {$this->db_table} SET found_time = %d WHERE post_id = %d AND found_url = '' AND query_text = %s",
+							time(),
+							$post->ID, $search_term);
+if(defined('wpPiratesSearch_DEBUG'))	echo htmlspecialchars($update) . '<br />';
+						$results = $wpdb->query($update);
+						if($results == 0){
+							$insert = $wpdb->prepare("INSERT INTO {$this->db_table} (post_id, found_url, query_text, found_time) " .
+								"VALUES (%d, '', %s, %d)", $post->ID, $search_term, time());
+if(defined('wpPiratesSearch_DEBUG'))	echo htmlspecialchars($insert) . '<br />';
+							$results = $wpdb->query($insert);
+						} // if
+					} // if
+				} // while
 
-						$insert = $wpdb->prepare("INSERT INTO {$this->db_table} (postid, status, searchengine, searchtext, resulttext, url, cacheurl, time) " .
-							"VALUES (%d, %s, %s, %s, %s, %s, %s, %d)", $postid, ($nomark ? 'legal' : 'none'), $site['searchengine'], $site['realtext'], $site['contents'], $site['urls'], $site['cacheUrl'], time());
+				if(empty($terms)){
+					$update = $wpdb->prepare("UPDATE {$this->db_table} SET found_time = %d WHERE post_id = %d AND found_url = '' AND query_text = ''",
+						time(),
+						$post->ID);
+if(defined('wpPiratesSearch_DEBUG'))	echo htmlspecialchars($update) . '<br />';
+					$results = $wpdb->query($update);
+					if($results == 0){
+						$insert = $wpdb->prepare("INSERT INTO {$this->db_table} (post_id, found_url, query_text, found_time) " .
+							"VALUES (%d, '', '', %d)", $post->ID, time());
 if(defined('wpPiratesSearch_DEBUG'))	echo htmlspecialchars($insert) . '<br />';
 						$results = $wpdb->query($insert);
-
-						unset($posttitles[$postid]);
-					  }
-					}
-				}
-			}
-		}
-
-		if(!empty($posttitles)) {
-			foreach ($posttitles as $postid => $posttitle) {
-			  $select = "SELECT * FROM {$this->db_table} WHERE postid = '{$postid}' AND status = 'ignore'";
-			  $results = $wpdb->query( $select );
-
-			  if($results == 0){
-				$update = "UPDATE {$this->db_table} SET time = '" . time() . "' WHERE postid = '{$postid}' AND url = '" . get_option('siteurl') . "'";
-if(defined('wpPiratesSearch_DEBUG'))	echo htmlspecialchars($update) . '<br />';
-				$results = $wpdb->query($update);
-
-				if($results == 0){
-					$insert = $wpdb->prepare("INSERT INTO {$this->db_table} (postid, url, time) " .
-						"VALUES (%d, %s, %d)", $postid, get_option('siteurl'), time());
-if(defined('wpPiratesSearch_DEBUG'))	echo htmlspecialchars($insert) . '<br />';
-					$results = $wpdb->query($insert);
-				}
-			  }
-			}
-		}
+					} // if
+				} // if
+			} // if
+		} // foreach
 	}
 
 	/** =====================================================================================================
@@ -638,38 +663,7 @@ if(defined('wpPiratesSearch_DEBUG'))	echo htmlspecialchars($insert) . '<br />';
 	*
 	* @return
 	*/
-	function google_check($query) {
-		$url = "http://ajax.googleapis.com/ajax/services/search/web?v=1.0&q=".urlencode($query);
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, $url);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_REFERER, trackback_url(false));
-		curl_setopt($ch, CURLOPT_TIMEOUT, 5);
-		$body = curl_exec($ch);
-		curl_close($ch);
-		if (!function_exists('Services_JSON')) require_once(dirname(__FILE__) . '/JSON.php');
-		$json = new Services_JSON();
-		$json = $json->decode($body);
-
-		if (is_array($json->responseData->results)) {
-			foreach ($json->responseData->results as $key => $resultjson) {
-				$result_google[$key]['searchengine']	= 'Google';
-				$result_google[$key]['urls']			= urldecode($resultjson->url);
-				$result_google[$key]['contents']		= $resultjson->content;
-				$result_google[$key]['cacheUrl']		= $resultjson->cacheUrl;
-				$result_google[$key]['realtext']		= $query;
-			}
-		}
-
-		return $result_google;
-	}
-
-	/** =====================================================================================================
-	*
-	*
-	* @return
-	*/
-	function yandex_check($query) {
+/*	function yandex_check($query) {
 		$url = "http://xmlsearch.yandex.ru/xmlsearch?query=".str_replace (" ", "%20", $query)."&groupby=attr%3Dd.mode%3Ddeep.groups-on-page%3D10.docs-in-group%3D1";
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
@@ -713,7 +707,7 @@ if(defined('wpPiratesSearch_DEBUG'))	echo htmlspecialchars($insert) . '<br />';
 	*
 	* @return
 	*/
-	function yandex_check_status() {
+/*	function yandex_check_status() {
 		$url = "http://xmlsearch.yandex.ru/xmlsearch";
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
@@ -739,47 +733,6 @@ if(defined('wpPiratesSearch_DEBUG'))	echo htmlspecialchars($insert) . '<br />';
 	*
 	* @return
 	*/
-	function word_count($sentence) {
-		$newsentense = explode(" ", $sentence);
-		$c = 0;
-		foreach ($newsentense as $newsentense_) {
-			if (strlen($newsentense_) > 1) {
-				$c++;
-			}
-		}
-
-		return $c;
-	}
-
-	/** =====================================================================================================
-	*
-	*
-	* @return
-	*/
-	function checkcontent($res) {
-		$opt = $this->get_options();
-
-		$resarray = explode("<b>", $res['contents']);
-		foreach ($resarray as $resarray_) {
-			if (strstr($resarray_, "</b>")) {
-				$text = explode("</b>", $resarray_);
-				$text = $text[0];
-				if (strlen($text) > 5) {
-					if($this->word_count($text) >= $opt['words_in_result']){
-						return true;
-					}
-				}
-			}
-		}
-
-		return false;
-	}
-
-	/** =====================================================================================================
-	*
-	*
-	* @return
-	*/
 	function print_result() {
 		global $wpdb;
 
@@ -787,86 +740,89 @@ if(defined('wpPiratesSearch_DEBUG'))	echo htmlspecialchars($insert) . '<br />';
 
 		$site_num = 0;
 
-		// $select = "SELECT * FROM {$this->db_table} WHERE status IN ('none', 'pirated', 'legal') AND searchtext IS NOT NULL ORDER BY time DESC";
-		$select = "SELECT * FROM {$this->db_table} WHERE status IN ('none', 'pirated') AND searchtext IS NOT NULL ORDER BY time DESC";
+		$select = "SELECT post_id, COUNT(DISTINCT query_text) AS cnt FROM {$this->db_table} WHERE status = 'found' GROUP BY post_id";
 		$results = $wpdb->get_results($select);
-
-		$nositesneed = array();
-		$settings_sites_filters = explode("\r\n", $opt['sites_filter']);
-		foreach($settings_sites_filters as $settings_sites_filter){
-			$nositesneed[] = $settings_sites_filter;
-		}
-// echo "Size: " . count($results) . "<br />";
-
-		foreach($results as $site){
-			$nomark = false;
-			foreach($nositesneed as $nositesneed_){
-				if (!empty($nositesneed_)) {
-					preg_match("/^(http:\/\/)?([^\/]+)/i", $site->url, $matches);
-					$nositesneed_ = str_replace("http://", "", $nositesneed_);
-					$nositesneed_ = str_replace("www.", "", $nositesneed_);
-					if (strstr($matches[2], $nositesneed_)) {
-					  $nomark = true;
-					  $select = $wpdb->prepare("UPDATE {$this->db_table} SET status = 'ignore' WHERE id = %d", $site->id);
-					  $wpdb->query( $select );
-					  break;
-					}
-				}
-			}
-			if($nomark == false)	$printresults[$site->postid][$site->url][] = $site;
-		}
-
-		if (is_array($printresults)) {
-			$action_url = str_replace("&id=" . $_GET['id'] . "&status=" . $_GET['status'], "", $_SERVER['REQUEST_URI']);
-			$action_url = str_replace("&postid=" . $_GET['postid'] . "&status=" . $_GET['status'], "", $_SERVER['REQUEST_URI']);
-			$action_url .= ((strpos($action_url, '?') === false) ? '?' : '&');
-
-			foreach ($printresults as $postid => $printresult) {
-				$post = &get_post($postid);
-	?>
-	<div id="site-<?php echo ++$site_num; ?>" class="postbox">
-		<h2><span><a href="<?php echo post_permalink($postid); ?>" target="_blank"><?php echo $post->post_title; ?></a></span></h2>
-		<div class="inside">
-		  <p><a href="<?php echo $action_url; ?>postid=<?php echo $postid; ?>&status=3" style="font-size:90%;color:#006400"><?php _e("Don't search for plagiarism for this post", 'wp-pirates-search'); ?></a></p>
-		  <ul>
-	<?php
-		foreach($printresult as $url => $res){
-			foreach($res as $site){
-			?>
-				<li class="wpPiratesSearch-<?php echo $site->status; ?>"><div><img src="/<?php echo PLUGINDIR . '/' . dirname(plugin_basename (__FILE__)) ?>/img/<?php echo strtolower($site->searchengine); ?>-ico.gif" alt="<?php echo $site->searchengine; ?>" width="16" height="16" />
-			<a href="<?php echo $url; ?>" target="_blank"><?php echo $url; ?></a>
-				<?php
-				if(!empty($site->cacheurl)){
-					echo "(<a href='{$site->cacheurl}' target='_blank'>" . __('CACHE', 'wp-pirates-search') . '</a>)';
-				}
-				?>
-				</div>
-				<div><b>Search:</b> <i><?php echo $site->searchtext; ?></i></div>
-				<div><b>Result: </b><?php echo $site->resulttext; ?></div>
-				<br />
-				<div>
-			<?php if ($site->status != 'legal') { ?>
-				<a href="<?php echo $action_url; ?>id=<?php echo $site->id?>&status=2" style="font-size:90%;color:#006400"><?php _e('This is not plagiarism', 'wp-pirates-search'); ?></a>
-			<?php } ?>
-			<?php if ($site->status != 'pirated') { ?>
-				<a href="<?php echo $action_url; ?>id=<?php echo $site->id?>&status=1" style="font-size:90%;color:#8B0000"><?php _e('It is a plagiarism', 'wp-pirates-search'); ?></a>
-			<?php } ?>
-			<?php if ($site->status != 'legal') { ?>
-				<a href="<?php echo $action_url; ?>id=<?php echo $site->id?>&status=0" style="font-size:90%;color:#000000"><?php _e('Plagiarism corrected', 'wp-pirates-search'); ?></a>
-			<?php } ?>
-				</div>
-			</li>
-			<?php
+		$num_of_queries = $post_rank = array();
+		foreach($results as $res){
+			if($res->cnt >= 5){
+				$num_of_queries[$res->post_id] = $res->cnt;
+				$post_rank[$res->post_id] = 0;
 			}
 		}
-	?></ul>
-		</div>
-	</div>
-	<?php
+		
+		$url_rank = array();
+		foreach(array_keys($num_of_queries) as $post_id){
+			$select = $wpdb->prepare("SELECT found_url, COUNT(DISTINCT query_text) AS rank FROM {$this->db_table} WHERE post_id = %d  AND found_url <> '' AND status IN ('found', 'warned') GROUP BY post_id, found_url", $post_id);
+			$results = $wpdb->get_results($select);
+			foreach($results as $res){
+				$rank = (int) ($res->rank * 100 / $num_of_queries[$post_id]);
+				$post_rank[$post_id] = max($post_rank[$post_id], $rank);
+				$url_rank[$post_id][$res->found_url] = $rank;
+// if(defined('wpPiratesSearch_DEBUG'))	echo "{$post_id}: {$rank} ({$post_rank[$post_id]})" . '<br />';
 			}
+			if(!empty($url_rank[$post_id]))
+				arsort($url_rank[$post_id]);
+// if(defined('wpPiratesSearch_DEBUG'))	echo var_export($url_rank[$post_id]) . '<br />';
 		}
-		else {
+		arsort($post_rank);
+// if(defined('wpPiratesSearch_DEBUG'))	echo var_export($post_rank) . '<br />';
+
+		if(empty($post_rank)){
 			print "<p>" . __('No posts matching found.', 'wp-pirates-search') . "</p>";
+			return;
+		}
+
+		$action_url = str_replace("&id=" . $_GET['id'] . "&status=" . $_GET['status'], "", $_SERVER['REQUEST_URI']);
+		$action_url = str_replace("&postid=" . $_GET['postid'] . "&status=" . $_GET['status'], "", $_SERVER['REQUEST_URI']);
+		$action_url .= ((strpos($action_url, '?') === false) ? '?' : '&');
+
+		$printresults = array();
+		$site_num = 0;
+		foreach(array_keys($post_rank) as $post_id){
+			if(!is_array($url_rank[$post_id]))
+				continue;
+
+			$post = &get_post($post_id);
+			?>
+			<div id="site-<?php echo ++$site_num; ?>" class="postbox">
+				<h2><span><a href="<?php echo post_permalink($post_id); ?>" target="_blank"><?php echo $post->post_title; ?></a></span></h2>
+				<div class="inside">
+				  <p><a href="<?php echo $action_url; ?>postid=<?php echo $post_id; ?>&status=3" style="font-size:90%;color:#006400"><?php _e("Don't search for plagiarism for this post", 'wp-pirates-search'); ?></a></p>
+				  <ul>
+			<?php
+			foreach(array_keys($url_rank[$post_id]) as $found_url){
+				$select = $wpdb->prepare("SELECT * FROM {$this->db_table} WHERE post_id = %d AND found_url = %s LIMIT 1", $post_id, $found_url);
+				$res = $wpdb->get_row($select);
+				?>
+				<li class="wpPiratesSearch-<?php echo $res->status; ?>"><div>
+				<strong><?php echo $url_rank[$post_id][$found_url] . '%'; ?></strong>
+				<a href="<?php echo $found_url; ?>" target="_blank"><?php echo $found_url; ?></a>
+					<?php
+					if(!empty($res->service_url)){
+						echo "(<a href='{$res->service_url}' target='_blank'>" . __('CACHE', 'wp-pirates-search') . '</a>)';
+					}
+					?>
+					</div>
+					<div><?php echo $res->found_text; ?></div>
+					<br />
+					<div>
+				<?php if ($res->status != 'legal') { ?>
+					<a href="<?php echo $action_url; ?>id=<?php echo $res->id?>&status=2" style="font-size:90%;color:#006400"><?php _e('This is not plagiarism', 'wp-pirates-search'); ?></a>
+				<?php } ?>
+				<?php if ($res->status != 'warned') { ?>
+					<a href="<?php echo $action_url; ?>id=<?php echo $res->id?>&status=1" style="font-size:90%;color:#8B0000"><?php _e('It is a plagiarism', 'wp-pirates-search'); ?></a>
+				<?php } ?>
+				<?php if ($res->status != 'legal') { ?>
+					<a href="<?php echo $action_url; ?>id=<?php echo $res->id?>&status=0" style="font-size:90%;color:#000000"><?php _e('Plagiarism corrected', 'wp-pirates-search'); ?></a>
+				<?php } ?>
+					</div>
+				</li>
+				<?php
+			}
+			?></ul>
+				</div>
+			</div>
+			<?php
 		}
 	}
 
@@ -878,17 +834,21 @@ if(defined('wpPiratesSearch_DEBUG'))	echo htmlspecialchars($insert) . '<br />';
 	function print_summary(){
 		global $wpdb;
 
-		$select = "SELECT COUNT(DISTINCT postid) FROM {$this->db_table}";
+		$select = "SELECT COUNT(DISTINCT post_id) FROM {$this->db_table}";
 		$numberofsearch = $wpdb->get_var($select);
 		?>
 		<h4><?php _e('Macro summary', 'wp-pirates-search'); ?></h4>
+		<div class="summary-line">
+			<span class="summary-title"><?php _e('Search engines are now used to search for pirates: ', 'wp-pirates-search'); ?></span>
+			<span class="summary-value"><?php echo join(', ', $this->searchengines['text']); ?></span>
+		</div>
 		<div class="summary-line">
 			<span class="summary-title"><?php _e('Total number of articles checked: ', 'wp-pirates-search'); ?></span>
 			<span class="summary-value"><?php echo $numberofsearch; ?></span>
 		</div>
 		<?php
 		//
-		$select = $wpdb->prepare("SELECT COUNT(DISTINCT postid) FROM {$this->db_table} WHERE time > %d", time() - 7 * 24 * 60 * 60);
+		$select = $wpdb->prepare("SELECT COUNT(DISTINCT post_id) FROM {$this->db_table} WHERE found_time > %d", time() - 7 * 24 * 60 * 60);
 		$numberofsearch = $wpdb->get_var($select);
 		?>
 		<div class="summary-line">
@@ -897,7 +857,7 @@ if(defined('wpPiratesSearch_DEBUG'))	echo htmlspecialchars($insert) . '<br />';
 		</div>
 		<?php
 		//
-		$select = $wpdb->prepare("SELECT COUNT(DISTINCT postid) FROM {$this->db_table} WHERE time > %d", time() - 24 * 60 * 60);
+		$select = $wpdb->prepare("SELECT COUNT(DISTINCT post_id) FROM {$this->db_table} WHERE found_time > %d", time() - 24 * 60 * 60);
 		$numberofsearch = $wpdb->get_var($select);
 		?>
 		<div class="summary-line">
@@ -905,20 +865,6 @@ if(defined('wpPiratesSearch_DEBUG'))	echo htmlspecialchars($insert) . '<br />';
 			<span class="summary-value"><?php echo $numberofsearch; ?></span>
 		</div>
 		<?php
-		//
-		$select = "SELECT searchengine, COUNT(DISTINCT searchtext) AS cnt FROM {$this->db_table} GROUP BY searchengine";
-		$numberofsearch = $wpdb->get_results($select);
-		foreach($numberofsearch as $res){
-			if(empty($res->searchengine))	continue;
-			?>
-			<div class="summary-line">
-				<span class="summary-title"><?php printf(__('Number of searched sentences against %s: ', 'wp-pirates-search'), $res->searchengine); ?></span>
-				<span class="summary-value"><?php echo $res->cnt; ?></span>
-			</div>
-			<?php
-		}
-		echo '&nbsp;';
-
 		/* Temproraly switched off
 		if(false){
 		?>
@@ -935,15 +881,15 @@ if(defined('wpPiratesSearch_DEBUG'))	echo htmlspecialchars($insert) . '<br />';
 		?>
 		</form>
 		<?php
-		}/**/
+		}/**
 		?>
 
 		<h4><?php _e('Detailled summary', 'wp-pirates-search'); ?></h4>
-		<p><?php _e('Show the last 20 articles and the number of searched sentences', 'wp-pirates-search'); ?></p>
+		<p><?php _e('Show the last 20 articles and the number of found URLs with terms ', 'wp-pirates-search'); ?></p>
 		<?php
 		$posts = get_posts('numberposts=20');
 		foreach($posts as $post){
-			$select = $wpdb->prepare("SELECT COUNT(DISTINCT searchtext) FROM {$this->db_table} WHERE postid = %d", $post->ID);
+			$select = $wpdb->prepare("SELECT COUNT(found_url) FROM {$this->db_table} WHERE post_id = %d", $post->ID);
 			$numberofsearch = $wpdb->get_var($select);
 			?>
 			<div class="summary-line" style="color:#999;">
@@ -951,7 +897,7 @@ if(defined('wpPiratesSearch_DEBUG'))	echo htmlspecialchars($insert) . '<br />';
 				<span class="summary-value"><?php echo $numberofsearch; ?></span>
 			</div>
 			<?php
-		}
+		}/**/
 		echo '&nbsp;';
 	}
 
@@ -963,6 +909,9 @@ if(defined('wpPiratesSearch_DEBUG'))	echo htmlspecialchars($insert) . '<br />';
 	function hidden_marker($content){
 		global $post;
 
+		$opt = $this->get_options();
+		if(!$opt['place_hidden_marker'])	return $content;
+		
 		$output = $content;
 		$key = 'copyright-' . preg_replace("|[/\.]+|", '_', preg_replace("|^.+://|", '', home_url()))/* . '-' . mysql2date('ymd', $post->post_date)/**/;
 		foreach(preg_split("/[\s,]+/", 'p ul ol li span h1 h2 h3 h4 h5 h6 h7 strong blockquote div') as $tag){
@@ -970,6 +919,151 @@ if(defined('wpPiratesSearch_DEBUG'))	echo htmlspecialchars($insert) . '<br />';
 		}
 		return $output;
 	}
+	
+	/** =====================================================================================================
+	* Extract search terms from post content
+	*
+	* @return array 
+	*/
+	protected function get_search_terms($post, $min_length = 7){
+		// Delete abstract and split text to sentences
+		$res = $this->get_sentences(preg_replace('@\A.*<!--more-->\s*@si', '', $post->post_content));
+
+		// Sort sentences and leave not less than 10 longest of it
+		$tmp = $snts = array();
+		foreach($res as $key => $val){
+			$tmp[$key] = $this->get_words_cnt($val);
+		}
+		arsort($tmp);
+		foreach($tmp as $key => $val){
+			if(((count($snts) <= 10) || ($val >= $min_length)) && (strlen($res[$key]) >= 10))
+				$snts[] = $res[$key];
+		}
+		shuffle($snts);
+		$res = array_slice($snts, 0, 10);
+
+		// Extract $min_length words length search terms from selected sentences
+		foreach($res as $key => $val){
+			$tmp = preg_split('@[\s-/]+@Ssiu', $val, -1, PREG_SPLIT_OFFSET_CAPTURE);
+			$n = mt_rand(0, max(0, count($tmp) - $min_length));
+			$x = $tmp[$n][1];
+			$y = !isset($tmp[$n + $min_length]) ? PHP_INT_MAX : $tmp[$n + $min_length][1];
+			$res[$key] = rtrim(substr($val, $x, $y - $x), "/.!?,;: \n\r-");
+		}
+
+		return $res;
+	}
+	
+	/** =====================================================================================================
+	* Split text to single sentences
+	*
+	* @return array single sentences
+	*/
+	protected function get_sentences($text){
+		// Convert HTML to plain text
+		$attr_value = '(?:"(?:\\.|[^"]+)*"|\'(?:\\.|[^\\\']*)\'|\S*)';
+		$attrs = "(?:\s+\w[-\w]*(?:\={$attr_value})?)*";
+		$search = array(
+			"@<!--.*?-->@Ssi"							=> '',	// Kill comments
+			"@<script{$attrs}\s*>.*?</script>@Ssi"		=> '',	// Kill scripts
+			"@<style{$attrs}\s*>.*?</style>@Ssi"		=> '',	// Kill CSS
+			"@<blockquote{$attrs}\s*>.*?</blockquote>@Ssi"	=> '',	// Kill blockquotes
+			"@<\w[-\w]*{$attrs}\s*(?:/\s*)?>@Ssi"		=> '',	// Kill any opening tags
+			"@<\s*/\s*(?:div|p|td|th|li|h[1-7])\s*>@Si"	=> "\1",	// Replace some closing tags to special sentence delimiter
+			"@<\s*/\s*\w[-\w]*\s*>@Si"					=> '',	// Kill any other closing tags
+			"@\[\w[-\w]*(?:\s+{$attr_value})*\s*\]@Ssiu"	=> '',	// Kill any opening shortcodes
+			"@\[\s*/\s*\w[-\w]*\s*\]@Siu"					=> '',	// Kill any closing shortcodes
+			"@\n[\s.]*\n@Ssi"							=> "\n",	// Kill empty lines
+			"@\s+@Su"									=> ' ',
+			"@[…]+@Su"									=> '.',
+			"@[—]@Su"									=> '-',
+			"@[«»“”„“‘’­]@Su"							=> '',
+		);
+		$text = html_entity_decode(preg_replace(array_keys($search), array_values($search), $text), ENT_COMPAT, 'UTF-8');
+		
+		// Split text into individual sentences
+		// Thanks webpavilion (http://www.maultalk.com/user12215.html) for base of this code
+		preg_match_all("@(?:\1|[\.!?]\s)@Su", $text, $m, PREG_OFFSET_CAPTURE);
+		array_unshift($m[0], array(0 => 0, 1 => 0));
+		$count = count($m[0]);
+		$s = 0;
+		$snts = array();
+		while($s < $count){
+			$l =  $m[0][$s + 1][1] - $m[0][$s][1] + 1;
+			if($l < 0)
+				$l = $m[0][$count - 1][1];
+			$str = rtrim(ltrim(substr($text, $m[0][$s][1], $l), "!?. \n\r\1"), "\1");
+			if(!empty($str))
+				$snts[] = $str;
+			$s++;
+		}
+
+		return $snts;
+	}
+	
+	/** =====================================================================================================
+	* Count number of words in text
+	*
+	* @return integer count of words
+	*/
+	protected function get_words_cnt($text){
+		preg_match_all('@[\.!?,;:\s-/]+@Ssiu', trim($text, "/.!?,;: \n\r-"), $m, PREG_OFFSET_CAPTURE);
+		return count($m[0]) + 1;
+	}
+	
+	/** =====================================================================================================
+	* Initialize Google Search API
+	*
+	*/
+	public function google_init($search_engines){
+		$search_engines['text'][] = 'Google';	// Defines what this plugin able to search text via Google
+		return $search_engines;
+	}
+	
+	/** =====================================================================================================
+	* 
+	*
+	*/
+	public function google_search($results, $search_type, $query, $exclude_sites){
+		if($search_type != 'text')
+			return $results;
+
+		$tr = array(
+			'"' => ''
+		);
+		$query = '"' . strtr($query, $tr) . '" -site:' . join(' -site:', $exclude_sites);
+// if(defined('wpPiratesSearch_DEBUG'))	echo $query . '<br />';
+		$url = "http://ajax.googleapis.com/ajax/services/search/web?v=1.0&q=" .
+			urlencode($query);
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, $url);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($ch, CURLOPT_REFERER, trackback_url(false));
+		curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+		$body = curl_exec($ch);
+		curl_close($ch);
+		if(!function_exists('Services_JSON'))
+			require_once(dirname(__FILE__) . '/JSON.php');
+		$json = new Services_JSON();
+		$json = $json->decode($body);
+
+		if(is_array($json->responseData->results)){
+			$pos = 0;
+			foreach($json->responseData->results as $key => $val){
+				$results[] = (object) array(
+					'search_engine'		=> 'Google',
+					'search_type'		=> 'text',
+					'search_query'		=> $query,
+					'result_position'	=> ++$pos,
+					'found_url'			=> urldecode($val->url),
+					'cache_url'			=> $val->cacheUrl,
+					'found_content'		=> $val->content,
+				);
+			}
+		}
+		return $results;
+	}
+	
 } // Class wpPiratesSearch
 
 } // if class_exists...
