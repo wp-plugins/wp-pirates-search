@@ -2,9 +2,9 @@
 # This file is distributed under the same license as the WP Pirates Search package.
 msgid ""
 msgstr ""
-"Project-Id-Version: WP Pirates Search 1.0\n"
+"Project-Id-Version: WP Pirates Search 1.0.3\n"
 "Report-Msgid-Bugs-To: http://wordpress.org/tag/wp-pirates-search\n"
-"POT-Creation-Date: 2011-01-10 16:12:20+00:00\n"
+"POT-Creation-Date: 2011-02-09 11:45:34+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -17,179 +17,196 @@ msgstr ""
 "X-Textdomain-Support: yes\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: wp-pirates-search.php:65
+#. Plugin Name of the plugin/theme
+#: wp-pirates-search.php:64
 msgid "WP Pirates Search"
 msgstr ""
 
-#: wp-pirates-search.php:67
+#. Plugin URI of the plugin/theme
+#: wp-pirates-search.php:66
 msgid "http://khrolenok.ru/en/wp-pirates-search/"
 msgstr ""
 
-#: wp-pirates-search.php:69
-msgid "This plugin allows you to find the pirates who coping articles from your website."
+#. Description of the plugin/theme
+#: wp-pirates-search.php:68
+msgid ""
+"This plugin allows you to find the pirates who coping articles from your "
+"website."
 msgstr ""
 
-#: wp-pirates-search.php:71
-msgid "Andrey Khrolenok"
+#. Author of the plugin/theme
+#: wp-pirates-search.php:70
+msgid "Andrey Khrolenok & Eric Gruson"
 msgstr ""
 
-#: wp-pirates-search.php:73
+#. Author URI of the plugin/theme
+#: wp-pirates-search.php:72
 msgid "http://khrolenok.ru/en/"
 msgstr ""
 
-#: wp-pirates-search.php:201
-msgid "Main Settings"
-msgstr ""
-
-#: wp-pirates-search.php:202
-msgid "Check posts at once for one time"
-msgstr ""
-
-#: wp-pirates-search.php:207
-#: wp-pirates-search.php:214
-#: wp-pirates-search.php:221
-#: wp-pirates-search.php:228
-#, php-format
-msgid "(Recomended value is %d)"
-msgstr ""
-
-#: wp-pirates-search.php:209
-msgid "Amount of sentences from one post"
-msgstr ""
-
-#: wp-pirates-search.php:216
-msgid "Amount of words one by one in result for compare"
-msgstr ""
-
-#: wp-pirates-search.php:223
-msgid "Check posts again every (hours)"
-msgstr ""
-
-#: wp-pirates-search.php:230
-msgid "Check only pending posts"
-msgstr ""
-
-#: wp-pirates-search.php:234
-msgid "Include searchengine yandex.ru?"
-msgstr ""
-
-#: wp-pirates-search.php:239
-msgid "Filter sites (one site in one line) which should not be displayed"
-msgstr ""
-
-#: wp-pirates-search.php:245
-msgid "Use automatic start processing"
-msgstr ""
-
-#: wp-pirates-search.php:248
-#, php-format
-msgid "Not recomended for sites with high traffic.<br />(If not checked, periodically fetch page <a href=\"%1$s\">%1$s</a> for processing new part of posts.)"
-msgstr ""
-
-#: wp-pirates-search.php:260
-#: wp-pirates-search.php:262
-#: wp-pirates-search.php:266
-#: wp-pirates-search.php:290
-#: wp-pirates-search.php:387
+#: wp-pirates-search.php:244 wp-pirates-search.php:246
+#: wp-pirates-search.php:250 wp-pirates-search.php:346
+#: wp-pirates-search.php:460
 msgid "Search for pirates"
 msgstr ""
 
-#: wp-pirates-search.php:262
-#, php-format
+#: wp-pirates-search.php:246
 msgid "%d pirated copy possible"
 msgid_plural "%d pirated copies possibles"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
-#: wp-pirates-search.php:272
+#: wp-pirates-search.php:259
 msgid "Go to Settings"
 msgstr ""
 
-#: wp-pirates-search.php:279
+#: wp-pirates-search.php:266
 msgid "Go to Search Results"
 msgstr ""
 
-#: wp-pirates-search.php:291
-#, php-format
-msgid ""
-"<p><strong>Instructions:</strong> Default settings are sufficient for 99%% of sites. Please note that the increase in value increases the load on the server of your website.<br/>\n"
-"Support page with questions and answers: %s (Please write in Russian or English, or use Google Translator for other languages)</p>"
+#: wp-pirates-search.php:294
+msgid "Main Settings"
 msgstr ""
 
-#: wp-pirates-search.php:296
+#: wp-pirates-search.php:295
+msgid "Check posts at once for one time"
+msgstr ""
+
+#: wp-pirates-search.php:300 wp-pirates-search.php:307
+#: wp-pirates-search.php:314 wp-pirates-search.php:321
+msgid "(Recomended value is %d)"
+msgstr ""
+
+#: wp-pirates-search.php:302
+msgid "Amount of sentences from one post"
+msgstr ""
+
+#: wp-pirates-search.php:309
+msgid "Amount of words one by one in result for compare"
+msgstr ""
+
+#: wp-pirates-search.php:316
+msgid "Check posts again every (hours)"
+msgstr ""
+
+#: wp-pirates-search.php:323
+msgid "Check only pending posts"
+msgstr ""
+
+#: wp-pirates-search.php:327
+msgid "Include searchengine yandex.ru?"
+msgstr ""
+
+#: wp-pirates-search.php:332
+msgid "Filter sites (one site in one line) which should not be displayed"
+msgstr ""
+
+#: wp-pirates-search.php:338
+msgid "Use automatic start processing"
+msgstr ""
+
+#: wp-pirates-search.php:341
+msgid ""
+"Not recomended for sites with high traffic.<br />(If not checked, "
+"periodically fetch page <a href=\"%1$s\">%1$s</a> for processing new part of "
+"posts.)"
+msgstr ""
+
+#: wp-pirates-search.php:347
+msgid ""
+"<p><strong>Instructions:</strong> Default settings are sufficient for 99%% "
+"of sites. Please note that the increase in value increases the load on the "
+"server of your website.<br/>\n"
+"Support page with questions and answers: %s (Please write in Russian or "
+"English, or use Google Translator for other languages)</p>"
+msgstr ""
+
+#: wp-pirates-search.php:352
 msgid "Save Changes"
 msgstr ""
 
-#: wp-pirates-search.php:328
+#: wp-pirates-search.php:394
 msgid "Value of posts can not be less than 1."
 msgstr ""
 
-#: wp-pirates-search.php:331
+#: wp-pirates-search.php:397
 msgid "Value of sentences can not be less than 1."
 msgstr ""
 
-#: wp-pirates-search.php:334
+#: wp-pirates-search.php:400
 msgid "Value of words can not be less than 1."
 msgstr ""
 
-#: wp-pirates-search.php:337
+#: wp-pirates-search.php:403
 msgid "Value hours can not be less than 1."
 msgstr ""
 
-#: wp-pirates-search.php:389
-msgid "Statistic"
+#: wp-pirates-search.php:455
+msgid "Possible plagiaries"
 msgstr ""
 
-#: wp-pirates-search.php:390
-#, php-format
-msgid "Over the last week processed %d article"
-msgid_plural "Over the last week processed %d articles"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-
-#: wp-pirates-search.php:390
-#, php-format
-msgid ", including the last 24 hours processed %d article."
-msgid_plural ", including the last 24 hours processed %d articles."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-
-#: wp-pirates-search.php:392
-msgid "Search results"
+#: wp-pirates-search.php:456
+msgid "Summary of searches"
 msgstr ""
 
-#: wp-pirates-search.php:616
+#: wp-pirates-search.php:729
 msgid "Yandex ready"
 msgstr ""
 
-#: wp-pirates-search.php:618
-#, php-format
-msgid "Yandex status: %1$d <a href=\"%2$s\" target=\"_blank\">Set/Change your server IP here, need for search by yandex.</a>"
+#: wp-pirates-search.php:731
+msgid ""
+"Yandex status: %1$d <a href=\"%2$s\" target=\"_blank\">Set/Change your "
+"server IP here, need for search by yandex.</a>"
 msgstr ""
 
-#: wp-pirates-search.php:700
+#: wp-pirates-search.php:828
 msgid "Don't search for plagiarism for this post"
 msgstr ""
 
-#: wp-pirates-search.php:710
+#: wp-pirates-search.php:838
 msgid "CACHE"
 msgstr ""
 
-#: wp-pirates-search.php:719
+#: wp-pirates-search.php:847
 msgid "This is not plagiarism"
 msgstr ""
 
-#: wp-pirates-search.php:722
+#: wp-pirates-search.php:850
 msgid "It is a plagiarism"
 msgstr ""
 
-#: wp-pirates-search.php:725
+#: wp-pirates-search.php:853
 msgid "Plagiarism corrected"
 msgstr ""
 
-#: wp-pirates-search.php:739
+#: wp-pirates-search.php:867
 msgid "No posts matching found."
+msgstr ""
+
+#: wp-pirates-search.php:882
+msgid "Macro summary"
+msgstr ""
+
+#: wp-pirates-search.php:884
+msgid "Total number of articles checked: "
+msgstr ""
+
+#: wp-pirates-search.php:893
+msgid "Checked articles last week: "
+msgstr ""
+
+#: wp-pirates-search.php:902
+msgid "Checked articles last 24 hours: "
+msgstr ""
+
+#: wp-pirates-search.php:913
+msgid "Number of searched sentences against %s: "
+msgstr ""
+
+#: wp-pirates-search.php:939
+msgid "Detailled summary"
+msgstr ""
+
+#: wp-pirates-search.php:940
+msgid "Show the last 20 articles and the number of searched sentences"
 msgstr ""
